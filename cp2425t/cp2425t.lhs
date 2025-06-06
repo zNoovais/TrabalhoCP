@@ -112,6 +112,8 @@
 %format outTree = "\mathsf{out}_{Tree}"
 %format outForest = "\mathsf{out}_{Forest}"
 
+
+
 %format (cata' (f) (g)) = "\llparenthesis\, " f "\:" g "\,\rrparenthesis"
 %format (ana' (f) (g)) = "\lanabracket\;\!" f "\:" g "\:\!\ranabracket"
 %format (hylo' (ft) (ff) (gt) (gf)) = "\llbracket\, " ft "\:" ff ",\," gt "\:" gf "\,\rrbracket"
@@ -701,30 +703,146 @@ que sejam necessárias.
 O problema 1 foi resolvido usando um hilomorfismo que consiste num anamorfismo
 que "faz pouco" e um catarmorfismo que "faz muito" ou seja um Easy Split/Hard Join.
 
-começamos com o anamorfismo,
+começamos com o anamorfismo:
 
 \begin{code}
-mysuffixes = undefined
-
-
 mysuffixes :: [a] -> [[a]]
+mysuffixes = anaList ((id -|- split cons p2) . outList)
+\end{code}
+
+Agora podemos começar com a cabeça de cada sub-lista e fazer uma procura exaustiva pela 
+lista de listas
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+&
+    |Nat0|^*
+    \ar[r]^-{|mysuffixes|}
+&
+    (|Nat0|^*)^*
+    \ar[r]_-{|map(split head tail)|}
+&
+    |Nat0 >< Nat0|^*
+}
+\end{eqnarray*}
+
+No final ao fazer a procura e o calculo todo em todas as sublistas fazemos o catamorfismo
+mymaximum que retira o maior elemento de uma lista
+
+\begin{code}
+mymaximum :: [Int] -> Int
+mymaximum = cataList (either (const 0) (uncurry max))
+\end{code}
+que de todas as sublistas calculadas a área maxima temos uma lista de áreas maximas então 
+calculamos o maximo 
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+&
+    |Nat0|^*
+    \ar[r]^-{|mymaximum|}
+&
+    |Nat0|   
+}
+\end{eqnarray*} 
+Agora precimos de uma função \textit{area} que a partir de um par head e tail faça o calculo 
+tendo em conta sempre a cabeça
+\begin{code}
+area :: (Int,[Int]) -> Int
+\end{code}
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Nat0 >< Nat0|^*
+    \ar[d]_-{|id >< ((map swap) . zip [1..])|}
+    \ar[rr]^{|area|}
+&
+&
+    |Nat0|
+\\
+    |Nat0 >< (Nat0 >< Nat0)|^*
+    \ar[d]_-{|split (id >< len) p2|}
+&
+& 
+\\
+    |(Nat0 >< Nat0) >< (Nat0 >< Nat0)|^*
+    \ar[d]_-{|(uncurry replicate . swap)>< id|}
+&
+&  
+\\
+    |Nat0|^* |>< (Nat0 >< Nat0)|^*
+    \ar[r]_-{|uncurry zip|}
+&
+    (|Nat0 >< (Nat0 >< Nat0)|)^*
+    \ar[r]_-{|map auxarea|} 
+&   
+    |Nat0|^*
+    \ar[uuu]_-{|mymaximum|} 
+}
+\end{eqnarray*}
+
+Onde temos como função auxiliar \textit{auxarea} que faz o calculo e a alternativa 
+qual dos extremos é o menor pra calcular a área.
+\begin{code}
+auxarea :: (Int,(Int,Int)) -> Int
+\end{code}
+Quero lembrar que o do par |Nat0 >< (Nat0 >< Nat0)| a \textbf{primeira componente} é a head ou seja uma 
+das alturas que estamos a calcular, a \textbf{segunda componente} é a segunda altura e por fim a 
+\textbf{ultima componente} é a respetiva distância entre as duas alturas. Agora basta verificar qual das 
+alturas é a menor e multiplicar pela distância.
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Nat0 >< (Nat0 >< Nat0)|
+    \ar[r]^-{|assocl|}
+    \ar[d]_-{|auxarea|}
+&
+    |(Nat0 >< Nat0) >< Nat0|  
+    \ar[r]^-{|(grd uncurry (>)) >< id|}
+&
+    |((Nat0 >< Nat0) + (Nat0 >< Nat0)) >< Nat0|
+    \ar[ld]^-{|(either p2 p1) >< id|}
+\\
+    |Nat0|
+&
+    |Nat0 >< Nat0|
+    \ar[l]^-{|uncurry (*)|}
+&  
+}
+\end{eqnarray*}
+
+Agora podemos exprimir \textit{area} e \textit{auxarea} em Haskell como:
+\begin{code}
+
+auxarea = uncurry (*) . (either p2 p1 >< id) . (grd (uncurry (>)) >< id) . assocl
+
+area = mymaximum . map auxarea . uncurry zip . (uncurry replicate . swap >< id ) . split (id >< length) p2  . (id >< map swap . zip [1..])
 
 \end{code}
 
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+&
+    |Nat0|^*
+    \ar[d]_-{|mysuffixes|}
+    \ar[rrdd]^-{|mostwater|}
+\\
+& 
+    (|Nat0|^*)^*
+    \ar[d]_-{|map(split head tail)|}
+\\
+&
+    |Nat0 >< Nat0|^*
+    \ar[r]_-{|map area|}
+&
+    |Nat0|^*
+    \ar[r]_-{|mymaximum|}
+&
+    |Nat0|
+}
+\end{eqnarray*}
+
+
 
 \begin{code}
-
-maximumInt :: [Int] -> Int
-maximumInt = cataList (either (const 0) (uncurry max))
-
-auxarea :: (Int,(Int,Int)) -> Int
-auxarea = uncurry (*) . (either p2 p1 >< id) . (grd (uncurry (>)) >< id) . assocl
-
-area :: (Int,[Int]) -> Int
-area = maximumInt . map auxarea . uncurry zip . (uncurry replicate . swap >< id ) . split (id >< length) p2  . (id >< map swap . zip [1..])
-
 mostwater = hyloList (either (const 0) (uncurry max . ((area . split head tail) >< id)))  ((id -|- split cons p2) . outList)
-
 \end{code}
 
 \subsection*{Problema 2}
@@ -781,7 +899,8 @@ loop (s,g,t,f,f2,g1,g2) =
     g1+2, 
     g2+2 )
 
----sadsadsda
+
+
 
 wrapper (x,_,_,_,_,_,_) = x 
 

@@ -264,6 +264,8 @@
 %
 
 
+
+
 %------------------------------------------------------------------------------%
 
 %====== DEFINIR GRUPO E ELEMENTOS =============================================%
@@ -963,36 +965,165 @@ que sejam necessárias.
 O problema 1 foi resolvido usando um hilomorfismo que consiste num anamorfismo
 que "faz pouco" e um catarmorfismo que "faz muito" ou seja um Easy Split/Hard Join.
 
-começamos com o anamorfismo,
+começamos com o anamorfismo:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{mysuffixes}\mathrel{=}\bot {}\<[E]%
-\\[\blanklineskip]%
 \>[B]{}\Varid{mysuffixes}\mathbin{::}[\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu [\mskip1.5mu \Varid{a}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{mysuffixes}\mathrel{=}\anaList{(\Varid{id}+\conj{\Varid{cons}}{\p2})\comp \Varid{outList}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+Agora podemos começar com a cabeça de cada sub-lista e fazer uma procura exaustiva pela 
+lista de listas
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+&
+    \ensuremath{\N_0}^*
+    \ar[r]^-{\ensuremath{\Varid{mysuffixes}}}
+&
+    (\ensuremath{\N_0}^*)^*
+    \ar[r]_-{\ensuremath{\map \;\conj{\Varid{head}}{\Varid{tail}}}}
+&
+    \ensuremath{\N_0\times\N_0}^*
+}
+\end{eqnarray*}
+
+No final ao fazer a procura e o calculo todo em todas as sublistas fazemos o catamorfismo
+mymaximum que retira o maior elemento de uma lista
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{mymaximum}\mathbin{::}[\mskip1.5mu \Conid{Int}\mskip1.5mu]\to \Conid{Int}{}\<[E]%
+\\
+\>[B]{}\Varid{mymaximum}\mathrel{=}\llparenthesis\, \alt{\underline{\mathrm{0}}}{\uncurry{\Varid{max}}}\,\rrparenthesis{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+que de todas as sublistas calculadas a área maxima temos uma lista de áreas maximas então 
+calculamos o maximo 
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+&
+    \ensuremath{\N_0}^*
+    \ar[r]^-{\ensuremath{\Varid{mymaximum}}}
+&
+    \ensuremath{\N_0}   
+}
+\end{eqnarray*} 
+Agora precimos de uma função \textit{area} que a partir de um par head e tail faça o calculo 
+tendo em conta sempre a cabeça
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{area}\mathbin{::}(\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu])\to \Conid{Int}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\N_0\times\N_0}^*
+    \ar[d]_-{\ensuremath{\Varid{id}\times((\map \;\Varid{swap})\comp \Varid{zip}\;[\mskip1.5mu \mathrm{1}\mathinner{\ldotp\ldotp}\mskip1.5mu])}}
+    \ar[rr]^{\ensuremath{\Varid{area}}}
+&
+&
+    \ensuremath{\N_0}
+\\
+    \ensuremath{\N_0\times(\N_0\times\N_0)}^*
+    \ar[d]_-{\ensuremath{\conj{\Varid{id}\times\Varid{len}}{\p2}}}
+&
+& 
+\\
+    \ensuremath{(\N_0\times\N_0)\times(\N_0\times\N_0)}^*
+    \ar[d]_-{\ensuremath{(\uncurry{\Varid{replicate}}\comp \Varid{swap})\times\Varid{id}}}
+&
+&  
+\\
+    \ensuremath{\N_0}^* \ensuremath{\times(\N_0\times\N_0)}^*
+    \ar[r]_-{\ensuremath{\uncurry{\Varid{zip}}}}
+&
+    (\ensuremath{\N_0\times(\N_0\times\N_0)})^*
+    \ar[r]_-{\ensuremath{\map \;\Varid{auxarea}}} 
+&   
+    \ensuremath{\N_0}^*
+    \ar[uuu]_-{\ensuremath{\Varid{mymaximum}}} 
+}
+\end{eqnarray*}
+
+Onde temos como função auxiliar \textit{auxarea} que faz o calculo e a alternativa 
+qual dos extremos é o menor pra calcular a área.
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{auxarea}\mathbin{::}(\Conid{Int},(\Conid{Int},\Conid{Int}))\to \Conid{Int}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Quero lembrar que o do par \ensuremath{\N_0\times(\N_0\times\N_0)} a \textbf{primeira componente} é a head ou seja uma 
+das alturas que estamos a calcular, a \textbf{segunda componente} é a segunda altura e por fim a 
+\textbf{ultima componente} é a respetiva distância entre as duas alturas. Agora basta verificar qual das 
+alturas é a menor e multiplicar pela distância.
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\N_0\times(\N_0\times\N_0)}
+    \ar[r]^-{\ensuremath{\Varid{assocl}}}
+    \ar[d]_-{\ensuremath{\Varid{auxarea}}}
+&
+    \ensuremath{(\N_0\times\N_0)\times\N_0}  
+    \ar[r]^-{\ensuremath{(\Varid{grd}\;\uncurry{\cdot }\;(\mathbin{>}))\times\Varid{id}}}
+&
+    \ensuremath{((\N_0\times\N_0)\mathbin{+}(\N_0\times\N_0))\times\N_0}
+    \ar[ld]^-{\ensuremath{\alt{\p2}{\p1}\times\Varid{id}}}
+\\
+    \ensuremath{\N_0}
+&
+    \ensuremath{\N_0\times\N_0}
+    \ar[l]^-{\ensuremath{\uncurry{(\mathbin{*})}}}
+&  
+}
+\end{eqnarray*}
+
+Agora podemos exprimir \textit{area} e \textit{auxarea} em Haskell como:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{109}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{auxarea}\mathrel{=}\uncurry{(\mathbin{*})}\comp (\alt{\p2}{\p1}\times\Varid{id})\comp (\Varid{grd}\;\uncurry{(\mathbin{>})}\times\Varid{id})\comp \Varid{assocl}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{area}\mathrel{=}\Varid{mymaximum}\comp \map \;\Varid{auxarea}\comp \uncurry{\Varid{zip}}\comp (\uncurry{\Varid{replicate}}\comp \Varid{swap}\times\Varid{id})\comp \conj{\Varid{id}\times\length }{\p2}{}\<[109]%
+\>[109]{}\comp (\Varid{id}\times\map \;\Varid{swap}\comp \Varid{zip}\;[\mskip1.5mu \mathrm{1}\mathinner{\ldotp\ldotp}\mskip1.5mu]){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+&
+    \ensuremath{\N_0}^*
+    \ar[d]_-{\ensuremath{\Varid{mysuffixes}}}
+    \ar[rrdd]^-{\ensuremath{\Varid{mostwater}}}
+\\
+& 
+    (\ensuremath{\N_0}^*)^*
+    \ar[d]_-{\ensuremath{\map \;\conj{\Varid{head}}{\Varid{tail}}}}
+\\
+&
+    \ensuremath{\N_0\times\N_0}^*
+    \ar[r]_-{\ensuremath{\map \;\Varid{area}}}
+&
+    \ensuremath{\N_0}^*
+    \ar[r]_-{\ensuremath{\Varid{mymaximum}}}
+&
+    \ensuremath{\N_0}
+}
+\end{eqnarray*}
+
 
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{91}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{110}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{maximumInt}\mathbin{::}[\mskip1.5mu \Conid{Int}\mskip1.5mu]\to \Conid{Int}{}\<[E]%
-\\
-\>[B]{}\Varid{maximumInt}\mathrel{=}\llparenthesis\, \alt{\underline{\mathrm{0}}}{\uncurry{\Varid{max}}}\,\rrparenthesis{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{auxarea}\mathbin{::}(\Conid{Int},(\Conid{Int},\Conid{Int}))\to \Conid{Int}{}\<[E]%
-\\
-\>[B]{}\Varid{auxarea}\mathrel{=}\uncurry{(\mathbin{*})}\comp (\alt{\p2}{\p1}\times\Varid{id})\comp (\Varid{grd}\;\uncurry{(\mathbin{>})}\times\Varid{id})\comp \Varid{assocl}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{area}\mathbin{::}(\Conid{Int},[\mskip1.5mu \Conid{Int}\mskip1.5mu])\to \Conid{Int}{}\<[E]%
-\\
-\>[B]{}\Varid{area}\mathrel{=}\Varid{maximumInt}\comp \map \;\Varid{auxarea}\comp \uncurry{\Varid{zip}}\comp (\uncurry{\Varid{replicate}}\comp \Varid{swap}\times\Varid{id})\comp \conj{\Varid{id}\times\length }{\p2}{}\<[110]%
-\>[110]{}\comp (\Varid{id}\times\map \;\Varid{swap}\comp \Varid{zip}\;[\mskip1.5mu \mathrm{1}\mathinner{\ldotp\ldotp}\mskip1.5mu]){}\<[E]%
-\\[\blanklineskip]%
 \>[B]{}\Varid{mostwater}\mathrel{=}\Varid{hyloList}\;\alt{\underline{\mathrm{0}}}{\uncurry{\Varid{max}}\comp ((\Varid{area}\comp \conj{\Varid{head}}{\Varid{tail}})\times\Varid{id})}\;{}\<[91]%
 \>[91]{}((\Varid{id}+\conj{\Varid{cons}}{\p2})\comp \Varid{outList}){}\<[E]%
 \ColumnHook
@@ -1068,8 +1199,6 @@ começamos com o anamorfismo,
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
 \>[5]{}\Varid{g2}\mathbin{+}\mathrm{2}){}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\mbox{\onelinecomment sadsadsda}{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{wrapper}\;(\Varid{x},\anonymous ,\anonymous ,\anonymous ,\anonymous ,\anonymous ,\anonymous )\mathrel{=}\Varid{x}{}\<[E]%
 \ColumnHook
