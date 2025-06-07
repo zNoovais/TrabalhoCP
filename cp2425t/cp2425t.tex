@@ -1096,6 +1096,8 @@ Agora podemos exprimir \textit{area} e \textit{auxarea} em Haskell como:
 \ColumnHook
 \end{hscode}\resethooks
 
+Finalmente temos uma definição para o mostwater que pode ser expressa neste diagrama:
+
 \begin{eqnarray*}
 \xymatrix@C=2cm{
 &
@@ -1108,7 +1110,7 @@ Agora podemos exprimir \textit{area} e \textit{auxarea} em Haskell como:
     \ar[d]_-{\ensuremath{\map \;\conj{\Varid{head}}{\Varid{tail}}}}
 \\
 &
-    \ensuremath{\N_0\times\N_0}^*
+    (\ensuremath{\N_0\times\N_0}^*)^*
     \ar[r]_-{\ensuremath{\map \;\Varid{area}}}
 &
     \ensuremath{\N_0}^*
@@ -1118,8 +1120,23 @@ Agora podemos exprimir \textit{area} e \textit{auxarea} em Haskell como:
 }
 \end{eqnarray*}
 
-
-
+Claro que para transformar num hylomorfismo de listas podemos utilizar algumas leis
+do \cp{Cálculo de Programas} nomeadamente a \textit{Composição de maps} e a 
+\textit{Absorção-Cata}
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{mostwater}\mathrel{=}\Varid{mymaximum}\comp \map \;\Varid{area}\comp \map \;\conj{\Varid{head}}{\Varid{tail}}\comp \Varid{mysuffixes}}
+\just\equiv{Functor-F}
+\ensuremath{\Varid{mostwater}\mathrel{=}\Varid{mymaximum}\comp \map \;(\Varid{area}\comp \conj{\Varid{head}}{\Varid{tail}})\comp \Varid{mysuffixes}}
+\just\equiv{mymaximum-definition}
+\ensuremath{\Varid{mostwater}\mathrel{=}\llparenthesis\, \alt{\underline{\mathrm{0}}}{\uncurry{\Varid{max}}}\,\rrparenthesis\comp \map \;(\Varid{area}\comp \conj{\Varid{head}}{\Varid{tail}})\comp \Varid{mysuffixes}}
+\just\equiv{Absorção-cata}
+\ensuremath{\Varid{mostwater}\mathrel{=}\llparenthesis\, \alt{\underline{\mathrm{0}}}{\uncurry{\Varid{max}}}\comp (\mathrm{1}\mathbin{+}((\Varid{area}\comp \conj{\Varid{head}}{\Varid{tail}})\times\Varid{id}))\,\rrparenthesis\comp \Varid{mysuffixes}}
+\just\equiv{Absorção-+, mysuffixes-definition}
+\ensuremath{\Varid{mostwater}\mathrel{=}\llparenthesis\, \alt{\underline{\mathrm{0}}}{\uncurry{\Varid{max}}\comp ((\Varid{area}\comp \conj{\Varid{head}}{\Varid{tail}})\times\Varid{id})}\,\rrparenthesis\comp \anaList{(\Varid{id}\mathbin{+}\conj{\Varid{cons}}{\p2})\comp \Varid{outList}}}
+\qed
+\end{eqnarray*}
+Temos a definição de mostwater como um hylomorfismo:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{91}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1128,6 +1145,39 @@ Agora podemos exprimir \textit{area} e \textit{auxarea} em Haskell como:
 \>[91]{}((\Varid{id}+\conj{\Varid{cons}}{\p2})\comp \Varid{outList}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando claro o seu 
+\textit{divide} e o seu \textit{conquer} também expondo a sua estrutura intermediária: 
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\N_0}^*
+    \ar[r]^-{\ensuremath{\Varid{out}}_*}
+    \ar[d]_-{\ensuremath{\Varid{divide}}}
+&
+    \ensuremath{\mathrm{1}\mathbin{+}\N_0\times\N_0}^*
+    \ar[r]^-{\ensuremath{(\Varid{id}\mathbin{+}\conj{\Varid{cons}}{\p2})}}
+&
+    \ensuremath{\mathrm{1}\mathbin{+}\N_0}^* \ensuremath{\times\N_0}^*
+    \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\Varid{divide}}}
+\\
+    (\ensuremath{\N_0}^*)^*
+    \ar[d]_-{conquer}
+    \ar@/^/[rr]^-{\ensuremath{\Varid{out}}_**}
+&
+&
+    \ensuremath{\mathrm{1}\mathbin{+}\N_0}^* \ensuremath{\times} ( \ensuremath{\N_0}^*)^*
+    \ar@/^/[ll]^-{\ensuremath{\mathbf{in}}_**}
+    \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\Varid{conquer}}}
+\\
+    \ensuremath{\N_0}
+&
+&
+    \ensuremath{\mathrm{1}\mathbin{+}\N_0}^* \ensuremath{\times\N_0}
+    \ar[ll]^-{\ensuremath{\alt{\underline{\mathrm{0}}}{\uncurry{\Varid{max}}\comp ((\Varid{area}\comp \conj{\Varid{head}}{\Varid{tail}})\times\Varid{id})}}} 
+}
+\end{eqnarray*}
+
+
 
 \subsection*{Problema 2}
 

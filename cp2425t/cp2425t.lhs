@@ -814,8 +814,9 @@ Agora podemos exprimir \textit{area} e \textit{auxarea} em Haskell como:
 auxarea = uncurry (*) . (either p2 p1 >< id) . (grd (uncurry (>)) >< id) . assocl
 
 area = mymaximum . map auxarea . uncurry zip . (uncurry replicate . swap >< id ) . split (id >< length) p2  . (id >< map swap . zip [1..])
-
 \end{code}
+
+Finalmente temos uma definição para o mostwater que pode ser expressa neste diagrama:
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -829,7 +830,7 @@ area = mymaximum . map auxarea . uncurry zip . (uncurry replicate . swap >< id )
     \ar[d]_-{|map(split head tail)|}
 \\
 &
-    |Nat0 >< Nat0|^*
+    (|Nat0 >< Nat0|^*)^*
     \ar[r]_-{|map area|}
 &
     |Nat0|^*
@@ -839,11 +840,69 @@ area = mymaximum . map auxarea . uncurry zip . (uncurry replicate . swap >< id )
 }
 \end{eqnarray*}
 
-
-
+Claro que para transformar num hylomorfismo de listas podemos utilizar algumas leis
+do \cp{Cálculo de Programas} nomeadamente a \textit{Composição de maps} e a 
+\textit{Absorção-Cata}
+\begin{eqnarray*}
+\start
+|
+	mostwater = mymaximum . map area . map (split head tail)  . mysuffixes
+|
+\just\equiv{Functor-F}
+|
+    mostwater = mymaximum . map (area . (split head tail)) . mysuffixes
+|
+\just\equiv{mymaximum-definition}
+|
+    mostwater = cataList(either (const 0) (uncurry max)) . map (area . (split head tail)) . mysuffixes
+|
+\just\equiv{Absorção-cata}
+|
+    mostwater = cataList(either (const 0) (uncurry max) . (1 + ((area . split head tail) >< id))) . mysuffixes
+|
+\just\equiv{Absorção-+, mysuffixes-definition}
+|
+    mostwater = cataList(either (const 0) (uncurry max . ((area . split head tail) >< id))) . anaList((id + split cons p2) . outList)
+|
+\qed
+\end{eqnarray*}
+Temos a definição de mostwater como um hylomorfismo:
 \begin{code}
 mostwater = hyloList (either (const 0) (uncurry max . ((area . split head tail) >< id)))  ((id -|- split cons p2) . outList)
 \end{code}
+Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando claro o seu 
+\textit{divide} e o seu \textit{conquer} também expondo a sua estrutura intermediária: 
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |Nat0|^*
+    \ar[r]^-{|out|_*}
+    \ar[d]_-{|divide|}
+&
+    |1 + Nat0 >< Nat0|^*
+    \ar[r]^-{|(id + split cons p2)|}
+&
+    |1 + Nat0|^* |>< Nat0|^*
+    \ar[d]^-{|id + id >< divide|}
+\\
+    (|Nat0|^*)^*
+    \ar[d]_-{conquer}
+    \ar@@/^/[rr]^-{|out|_**}
+&
+&
+    |1 + Nat0|^* |><| ( |Nat0|^*)^*
+    \ar@@/^/[ll]^-{|in|_**}
+    \ar[d]^{|id + id >< conquer|}
+\\
+    |Nat0|
+&
+&
+    |1+ Nat0|^* |>< Nat0|
+    \ar[ll]^-{|either (const 0) (uncurry max . ((area . split head tail) >< id))|} 
+}
+\end{eqnarray*}
+
+
 
 \subsection*{Problema 2}
 
