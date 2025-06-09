@@ -887,11 +887,11 @@ Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando clar
 \\
     (|Nat0|^*)^*
     \ar[d]_-{conquer}
-    \ar@@/^/[rr]^-{|out|_**}
+    \ar@@/^/[rr]^-{|out|_{**}}
 &
 &
     |1 + Nat0|^* |><| ( |Nat0|^*)^*
-    \ar@@/^/[ll]^-{|in|_**}
+    \ar@@/^/[ll]^-{in_{**}}
     \ar[d]^{|id + id >< conquer|}
 \\
     |Nat0|
@@ -907,6 +907,7 @@ Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando clar
 \subsection*{Problema 2}
 
 \begin{code}
+ 
 
 auxR :: ((a,s) -> Bool) -> ((a,s) -> (c,s)) -> ([a],([c],s)) -> ([c],s)
 auxR h f =  either (swap . ( id >< uncurry (:) ) . assocr . (swap >< id) . p2) ( swap . (p2 >< id ) . p2) . grd p1 . (h >< (f >< id)) . split (id >< p2) (assocl . (id >< swap)) . (head >< id)
@@ -940,46 +941,249 @@ mapAccumLfilter h f = anaLP (((nil >< id) -|- auxL h f) . outLP)
 
 \subsection*{Problema 3}
 
+O problema 3 foi resolvido por recursividade mutua, primeiro como objetivo:
+definir as funçoes que mutuamente realizam chamadas recursivas entre si. 
+    Para isto precisamos da forma recursiva do somatorio em haskell
+\begin{code}
+picalcRec :: Fractional a => Integer -> a
+picalcRec 0 = 2
+picalcRec n = fromIntegral (Nat.fac n)^2 * 2^(n+1) / fromIntegral (Nat.fac (2*n+1)) + picalc (n-1)
+\end{code}
+Podemos ver que nesta definição há várias dependencia de n, temos que aplicar a 
+\textit{regra da algibeira} para cada ocorrencia, ou seja, para cada ocorrencia
+de n temos que associar a outra função qualquer f (n-1)
+
+\begin{eqnarray*}
+\start
+|
+    n!^2 * 2^{n+1} / (2*n + 1)! + picalc(n-1)
+|
+\just\equiv{|let f (n-1) = n!|}
+|
+    f(n-1) = n!
+|
+    \Rightarrow
+|
+    f n = (n+1)!
+|
+    \Rightarrow
+|
+    lcbr(
+        f 0 = 1
+    )(
+        f n = (n + 1)*f (n-1)
+    )
+|
+\just\equiv{|let f2(n-1) = n+1|}
+|
+    lcbr(
+        lcbr(
+            f 0 = 1
+        )(
+            f n = f2(n-1)*f(n-1)
+        )
+    )(
+        lcbr(
+            f2 0 = 2
+        )(
+            f2 n = n+2
+        )
+    )
+|
+\end{eqnarray*}
+
+Feito para o n!. Agora aplicamos a mesma regra a todas as ocorrencia de n e por 
+fim extraimos os seus valores iniciais e operações para o \textit{ciclo for}
+
+\begin{eqnarray*}
+\start
+|
+    f(n-1)^2 * 2^{n+1} / (2*n + 1)! + picalcRec(n-1)
+|
+\just\equiv{|let t (n-1) = 2^{n+1}|}
+|
+    t(n-1) = 2^{n+1}
+|
+    \Rightarrow
+|
+    t n = 2^{n+2}
+|
+    \Rightarrow
+|
+    lcbr(
+        t 0 = 4
+    )(
+        t n = 2*t(n-1)
+    )
+|
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\start
+|
+    f(n-1)^2 * t(n-1) / (2*n + 1)! + picalc(n-1)
+|
+\just\equiv{|let g (n-1) = (2*n+1)!|}
+|
+    g(n-1) = (2*n+1)!
+|
+    \Rightarrow
+|
+    g n = (2*n+3)!
+|
+    \Rightarrow
+|
+    lcbr(
+        g 0 = 6
+    )(
+        g n = (2*n+2)*(2*n+3)*g (n-1)
+    )
+|
+\just\equiv{|let g1(n-1) = 2*n+2 and g2(n-1) = (2*n+3)|}
+|
+    lcbr(
+        lcbr(
+            g1 0 = 4
+        )(
+            g1 n = 2*n+4
+        )
+    )(
+        lcbr(
+            g2 0 = 5
+        )(
+            g2 n = 2*n+5
+        )
+    )
+|
+|
+    lcbr(
+        g 0 = 6
+    )(
+        g n = g1(n-1)*g2(n-1)*g(n-1)
+    )
+|
+\end{eqnarray*}
+
+Agora finalmente temos todas as operações e valores inicias tendo a nossa equação
+do picalc neste modelo
+\begin{eqnarray*}
+\start
+|
+    lcbr(
+        picalc 0 = 2
+    )(
+        f(n-1)^2 * t(n-1) / g(n-1) + picalc(n-1)
+    )
+|
+\end{eqnarray*}
+
+Vamos agora construir piloop com as informações que nos calculamos anteriormente
+(para simplificação chamaremos s = picalcRec)
+
+Vamos agorar fazer as operações:
+
+
+Operação do s:
+\begin{code}
+inicS = 2
+op_S s f g t =  fromIntegral (f^2*t)/ fromIntegral g + s
+\end{code}
+
+Operação do g:
+\begin{code}
+inicG = 6
+op_G g g1 g2 =  g*g1*g2
+\end{code}
+
+Operação do t:
+\begin{code}
+inicT = 4
+op_T t = 2*t
+\end{code}
+
+Operação do f:
+\begin{code}
+inicF = 1
+op_F f f2 =  f*f2
+\end{code}
+
+operação do f2
+\begin{code}
+inicF2 = 2
+op_F2 f f2 = succ f2
+\end{code}
+
+Operação do g1:
+\begin{code}
+inicG1 = 4
+op_G1 g1 =  g1+2
+\end{code}
+
+Operação do g2:
+\begin{code}
+inicG2 = 5
+op_G2 g2 =  g2+2
+\end{code}
+
+Temos agora tudo para construir o \textit{ciclo for} 
 
 \begin{code}
+worker = for loop inic
+\end{code}
+Os nossos valores iniciais vão ser os casos bases de cada função que definimos
+\begin{code}
+inic = (inicS,inicG,inicT,inicF,inicF2,inicG1,inicG2)
+\end{code}
+
+E as operações ja definimos também:
+\begin{code}
+loop (s,g,t,f,f2,g1,g2) = 
+                          (op_S s f g t,
+                           op_G g g1 g2,
+                           op_T t,
+                           op_F f f2,
+                           op_F2 f f2,
+                           op_G1 g1,
+                           op_G2 g2
+                           )
+\end{code}
+
+por fim precisamos filtrar somente o nosso resultado que vai ser a primeira componente 
+do tuplo:
+
+\begin{code}
+wrapper (x,_,_,_,_,_,_) = x
+\end{code}
+
+Por fim temos a nossa função feita baseada num \textit{ciclo for} 
+\begin{code}
 piloop = wrapper . worker
-
-worker = for loop inic 
-
-inic = (2,6,4,1,2,4,5)
-
-loop (s,g,t,f,f2,g1,g2) =
-
-    (s + fromIntegral(f^2*t)/fromIntegral g,
-    g*g1*g2, 
-    t*2, 
-    f*f2, 
-    succ f2, 
-    g1+2, 
-    g2+2 )
-
-
-
-
-wrapper (x,_,_,_,_,_,_) = x 
-
-
-
 \end{code}
 
 \subsection*{Problema 4}
+
+
+
+\begin{code}
+miuaux :: ([(a,Int)],Int) -> [(a,Int)]
+miuaux = map ((id >< uncurry (*)) . assocr). uncurry zip . (id >< uncurry replicate) . assocr . (split id length >< id)
+
+miuV :: Vec (Vec a) -> Vec a
+miuV = V . concatMap (miuaux . (outV >< id)) . outV
+\end{code}
+
 Functor:
 \begin{code}
 instance Functor Vec where
-    fmap f = undefined
+    fmap f = V . map (f >< id) . outV
 \end{code}
 Monad:
 \begin{code}
 instance Monad Vec where
-   x >>= f = undefined
-   return = undefined
-
+   x >>= f = miuV (fmap f x)
+   return = V . singl . split id (const 1)
 \end{code}
+
 
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%

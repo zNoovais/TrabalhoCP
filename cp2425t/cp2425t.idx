@@ -216,5 +216,13 @@
 \indexentry{Função!\emph  {uncurry}|hyperpage}{12}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{12}
 \indexentry{Combinador ``pointfree''!\emph  {either}|hyperpage}{12}
-\indexentry{Função!\emph  {for}|hyperpage}{12}
-\indexentry{Função!\emph  {succ}|hyperpage}{12}
+\indexentry{Função!\emph  {succ}|hyperpage}{14}
+\indexentry{Função!\emph  {for}|hyperpage}{14}
+\indexentry{Função!\emph  {map}|hyperpage}{15}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{15}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{15}
+\indexentry{Função!\emph  {uncurry}|hyperpage}{15}
+\indexentry{Função!\emph  {length}|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {split}|hyperpage}{15}
+\indexentry{Função!\emph  {map}|hyperpage}{15}
+\indexentry{Combinador ``pointfree''!\emph  {split}|hyperpage}{15}

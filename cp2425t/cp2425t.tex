@@ -1162,11 +1162,11 @@ Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando clar
 \\
     (\ensuremath{\N_0}^*)^*
     \ar[d]_-{conquer}
-    \ar@/^/[rr]^-{\ensuremath{\Varid{out}}_**}
+    \ar@/^/[rr]^-{\ensuremath{\Varid{out}}_{**}}
 &
 &
     \ensuremath{\mathrm{1}\mathbin{+}\N_0}^* \ensuremath{\times} ( \ensuremath{\N_0}^*)^*
-    \ar@/^/[ll]^-{\ensuremath{\mathbf{in}}_**}
+    \ar@/^/[ll]^-{in_{**}}
     \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\Varid{conquer}}}
 \\
     \ensuremath{\N_0}
@@ -1216,45 +1216,242 @@ Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando clar
 
 \subsection*{Problema 3}
 
+O problema 3 foi resolvido por recursividade mutua, primeiro como objetivo:
+definir as funçoes que mutuamente realizam chamadas recursivas entre si. 
+    Para isto precisamos da forma recursiva do somatorio em haskell
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{picalcRec}\mathbin{::}\Conid{Fractional}\;\Varid{a}\Rightarrow \mathbb{Z}\to \Varid{a}{}\<[E]%
+\\
+\>[B]{}\Varid{picalcRec}\;\mathrm{0}\mathrel{=}\mathrm{2}{}\<[E]%
+\\
+\>[B]{}\Varid{picalcRec}\;\Varid{n}\mathrel{=}\Varid{fromIntegral}\;(\Varid{\Conid{Nat}.fac}\;\Varid{n})\mathbin{\uparrow}\mathrm{2}\mathbin{*}\mathrm{2}\mathbin{\uparrow}(\Varid{n}\mathbin{+}\mathrm{1})\mathbin{/}\Varid{fromIntegral}\;(\Varid{\Conid{Nat}.fac}\;(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1}))\mathbin{+}\pi_{\mathit{calc}}\;(\Varid{n}\mathbin{-}\mathrm{1}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Podemos ver que nesta definição há várias dependencia de n, temos que aplicar a 
+\textit{regra da algibeira} para cada ocorrencia, ou seja, para cada ocorrencia
+de n temos que associar a outra função qualquer f (n-1)
+
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{n}\mathbin{!\char94 }\mathrm{2}\mathbin{*}\mathrm{2}\mathbin{\uparrow}\{\mskip1.5mu \Varid{n}\mathbin{+}\mathrm{1}\mskip1.5mu\}\mathbin{/}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1})\mathbin{!}\mathbin{+}\pi_{\mathit{calc}}\;(\Varid{n}\mathbin{-}\mathrm{1})}
+\just\equiv{\ensuremath{\mathbf{let}\;\Varid{f}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathrel{=}\Varid{n}\mathbin{!}}}
+\ensuremath{\Varid{f}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathrel{=}\Varid{n}\mathbin{!}}
+    \Rightarrow
+\ensuremath{\Varid{f}\;\Varid{n}\mathrel{=}(\Varid{n}\mathbin{+}\mathrm{1})\mathbin{!}}
+    \Rightarrow
+\ensuremath{\begin{lcbr}\Varid{f}\;\mathrm{0}\mathrel{=}\mathrm{1}\\\Varid{f}\;\Varid{n}\mathrel{=}(\Varid{n}\mathbin{+}\mathrm{1})\mathbin{*}\Varid{f}\;(\Varid{n}\mathbin{-}\mathrm{1})\end{lcbr}}
+\just\equiv{\ensuremath{\mathbf{let}\;\Varid{f2}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathrel{=}\Varid{n}\mathbin{+}\mathrm{1}}}
+\ensuremath{\begin{lcbr}\begin{lcbr}\Varid{f}\;\mathrm{0}\mathrel{=}\mathrm{1}\\\Varid{f}\;\Varid{n}\mathrel{=}\Varid{f2}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{*}\Varid{f}\;(\Varid{n}\mathbin{-}\mathrm{1})\end{lcbr}\\\begin{lcbr}\Varid{f2}\;\mathrm{0}\mathrel{=}\mathrm{2}\\\Varid{f2}\;\Varid{n}\mathrel{=}\Varid{n}\mathbin{+}\mathrm{2}\end{lcbr}\end{lcbr}}
+\end{eqnarray*}
+
+Feito para o n!. Agora aplicamos a mesma regra a todas as ocorrencia de n e por 
+fim extraimos os seus valores iniciais e operações para o \textit{ciclo for}
+
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{f}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{\uparrow}\mathrm{2}\mathbin{*}\mathrm{2}\mathbin{\uparrow}\{\mskip1.5mu \Varid{n}\mathbin{+}\mathrm{1}\mskip1.5mu\}\mathbin{/}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1})\mathbin{!}\mathbin{+}\Varid{picalcRec}\;(\Varid{n}\mathbin{-}\mathrm{1})}
+\just\equiv{\ensuremath{\mathbf{let}\;\Varid{t}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathrel{=}\mathrm{2}\mathbin{\uparrow}\{\mskip1.5mu \Varid{n}\mathbin{+}\mathrm{1}\mskip1.5mu\}}}
+\ensuremath{\Varid{t}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathrel{=}\mathrm{2}\mathbin{\uparrow}\{\mskip1.5mu \Varid{n}\mathbin{+}\mathrm{1}\mskip1.5mu\}}
+    \Rightarrow
+\ensuremath{\Varid{t}\;\Varid{n}\mathrel{=}\mathrm{2}\mathbin{\uparrow}\{\mskip1.5mu \Varid{n}\mathbin{+}\mathrm{2}\mskip1.5mu\}}
+    \Rightarrow
+\ensuremath{\begin{lcbr}\Varid{t}\;\mathrm{0}\mathrel{=}\mathrm{4}\\\Varid{t}\;\Varid{n}\mathrel{=}\mathrm{2}\mathbin{*}\Varid{t}\;(\Varid{n}\mathbin{-}\mathrm{1})\end{lcbr}}
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{f}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{t}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{/}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1})\mathbin{!}\mathbin{+}\pi_{\mathit{calc}}\;(\Varid{n}\mathbin{-}\mathrm{1})}
+\just\equiv{\ensuremath{\mathbf{let}\;\Varid{g}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathrel{=}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1})\mathbin{!}}}
+\ensuremath{\Varid{g}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathrel{=}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1})\mathbin{!}}
+    \Rightarrow
+\ensuremath{\Varid{g}\;\Varid{n}\mathrel{=}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{3})\mathbin{!}}
+    \Rightarrow
+\ensuremath{\begin{lcbr}\Varid{g}\;\mathrm{0}\mathrel{=}\mathrm{6}\\\Varid{g}\;\Varid{n}\mathrel{=}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{2})\mathbin{*}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{3})\mathbin{*}\Varid{g}\;(\Varid{n}\mathbin{-}\mathrm{1})\end{lcbr}}
+\just\equiv{\ensuremath{\mathbf{let}\;\Varid{g1}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathrel{=}\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{2}\;\Varid{and}\;\Varid{g2}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathrel{=}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{3})}}
+\ensuremath{\begin{lcbr}\begin{lcbr}\Varid{g1}\;\mathrm{0}\mathrel{=}\mathrm{4}\\\Varid{g1}\;\Varid{n}\mathrel{=}\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{4}\end{lcbr}\\\begin{lcbr}\Varid{g2}\;\mathrm{0}\mathrel{=}\mathrm{5}\\\Varid{g2}\;\Varid{n}\mathrel{=}\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{5}\end{lcbr}\end{lcbr}}
+\ensuremath{\begin{lcbr}\Varid{g}\;\mathrm{0}\mathrel{=}\mathrm{6}\\\Varid{g}\;\Varid{n}\mathrel{=}\Varid{g1}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{*}\Varid{g2}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{*}\Varid{g}\;(\Varid{n}\mathbin{-}\mathrm{1})\end{lcbr}}
+\end{eqnarray*}
+
+Agora finalmente temos todas as operações e valores inicias tendo a nossa equação
+do picalc neste modelo
+\begin{eqnarray*}
+\start
+\ensuremath{\begin{lcbr}\pi_{\mathit{calc}}\;\mathrm{0}\mathrel{=}\mathrm{2}\\\Varid{f}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{t}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{/}\Varid{g}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{+}\pi_{\mathit{calc}}\;(\Varid{n}\mathbin{-}\mathrm{1})\end{lcbr}}
+\end{eqnarray*}
+
+Vamos agora construir piloop com as informações que nos calculamos anteriormente
+(para simplificação chamaremos s = picalcRec)
+
+Vamos agorar fazer as operações:
+
+
+Operação do s:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{inicS}\mathrel{=}\mathrm{2}{}\<[E]%
+\\
+\>[B]{}\Varid{op\char95 S}\;\Varid{s}\;\Varid{f}\;\Varid{g}\;\Varid{t}\mathrel{=}{}\<[17]%
+\>[17]{}\Varid{fromIntegral}\;(\Varid{f}\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{t})\mathbin{/}\Varid{fromIntegral}\;\Varid{g}\mathbin{+}\Varid{s}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Operação do g:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{17}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{inicG}\mathrel{=}\mathrm{6}{}\<[E]%
+\\
+\>[B]{}\Varid{op\char95 G}\;\Varid{g}\;\Varid{g1}\;\Varid{g2}\mathrel{=}{}\<[17]%
+\>[17]{}\Varid{g}\mathbin{*}\Varid{g1}\mathbin{*}\Varid{g2}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Operação do t:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{inicT}\mathrel{=}\mathrm{4}{}\<[E]%
+\\
+\>[B]{}\Varid{op\char95 T}\;\Varid{t}\mathrel{=}\mathrm{2}\mathbin{*}\Varid{t}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Operação do f:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{14}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{inicF}\mathrel{=}\mathrm{1}{}\<[E]%
+\\
+\>[B]{}\Varid{op\char95 F}\;\Varid{f}\;\Varid{f2}\mathrel{=}{}\<[14]%
+\>[14]{}\Varid{f}\mathbin{*}\Varid{f2}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+operação do f2
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{inicF2}\mathrel{=}\mathrm{2}{}\<[E]%
+\\
+\>[B]{}\Varid{op\char95 F2}\;\Varid{f}\;\Varid{f2}\mathrel{=}\succ \;\Varid{f2}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Operação do g1:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{inicG1}\mathrel{=}\mathrm{4}{}\<[E]%
+\\
+\>[B]{}\Varid{op\char95 G1}\;\Varid{g1}\mathrel{=}{}\<[13]%
+\>[13]{}\Varid{g1}\mathbin{+}\mathrm{2}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Operação do g2:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{inicG2}\mathrel{=}\mathrm{5}{}\<[E]%
+\\
+\>[B]{}\Varid{op\char95 G2}\;\Varid{g2}\mathrel{=}{}\<[13]%
+\>[13]{}\Varid{g2}\mathbin{+}\mathrm{2}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Temos agora tudo para construir o \textit{ciclo for} 
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\pi_{\mathit{loop}}\mathrel{=}\Varid{wrapper}\comp \Varid{worker}{}\<[E]%
-\\[\blanklineskip]%
 \>[B]{}\Varid{worker}\mathrel{=}\for{\Varid{loop}}\ {\Varid{inic}}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{inic}\mathrel{=}(\mathrm{2},\mathrm{6},\mathrm{4},\mathrm{1},\mathrm{2},\mathrm{4},\mathrm{5}){}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+Os nossos valores iniciais vão ser os casos bases de cada função que definimos
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{inic}\mathrel{=}(\Varid{inicS},\Varid{inicG},\Varid{inicT},\Varid{inicF},\Varid{inicF2},\Varid{inicG1},\Varid{inicG2}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+E as operações ja definimos também:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{27}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{28}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{loop}\;(\Varid{s},\Varid{g},\Varid{t},\Varid{f},\Varid{f2},\Varid{g1},\Varid{g2})\mathrel{=}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\hsindent{5}{}\<[5]%
-\>[5]{}(\Varid{s}\mathbin{+}\Varid{fromIntegral}\;(\Varid{f}\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{t})\mathbin{/}\Varid{fromIntegral}\;\Varid{g},{}\<[E]%
 \\
-\>[B]{}\hsindent{5}{}\<[5]%
-\>[5]{}\Varid{g}\mathbin{*}\Varid{g1}\mathbin{*}\Varid{g2},{}\<[E]%
+\>[B]{}\hsindent{27}{}\<[27]%
+\>[27]{}(\Varid{op\char95 S}\;\Varid{s}\;\Varid{f}\;\Varid{g}\;\Varid{t},{}\<[E]%
 \\
-\>[B]{}\hsindent{5}{}\<[5]%
-\>[5]{}\Varid{t}\mathbin{*}\mathrm{2},{}\<[E]%
+\>[27]{}\hsindent{1}{}\<[28]%
+\>[28]{}\Varid{op\char95 G}\;\Varid{g}\;\Varid{g1}\;\Varid{g2},{}\<[E]%
 \\
-\>[B]{}\hsindent{5}{}\<[5]%
-\>[5]{}\Varid{f}\mathbin{*}\Varid{f2},{}\<[E]%
+\>[27]{}\hsindent{1}{}\<[28]%
+\>[28]{}\Varid{op\char95 T}\;\Varid{t},{}\<[E]%
 \\
-\>[B]{}\hsindent{5}{}\<[5]%
-\>[5]{}\succ \;\Varid{f2},{}\<[E]%
+\>[27]{}\hsindent{1}{}\<[28]%
+\>[28]{}\Varid{op\char95 F}\;\Varid{f}\;\Varid{f2},{}\<[E]%
 \\
-\>[B]{}\hsindent{5}{}\<[5]%
-\>[5]{}\Varid{g1}\mathbin{+}\mathrm{2},{}\<[E]%
+\>[27]{}\hsindent{1}{}\<[28]%
+\>[28]{}\Varid{op\char95 F2}\;\Varid{f}\;\Varid{f2},{}\<[E]%
 \\
-\>[B]{}\hsindent{5}{}\<[5]%
-\>[5]{}\Varid{g2}\mathbin{+}\mathrm{2}){}\<[E]%
-\\[\blanklineskip]%
+\>[27]{}\hsindent{1}{}\<[28]%
+\>[28]{}\Varid{op\char95 G1}\;\Varid{g1},{}\<[E]%
+\\
+\>[27]{}\hsindent{1}{}\<[28]%
+\>[28]{}\Varid{op\char95 G2}\;\Varid{g2}{}\<[E]%
+\\
+\>[27]{}\hsindent{1}{}\<[28]%
+\>[28]{}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+por fim precisamos filtrar somente o nosso resultado que vai ser a primeira componente 
+do tuplo:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{wrapper}\;(\Varid{x},\anonymous ,\anonymous ,\anonymous ,\anonymous ,\anonymous ,\anonymous )\mathrel{=}\Varid{x}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
+Por fim temos a nossa função feita baseada num \textit{ciclo for} 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\pi_{\mathit{loop}}\mathrel{=}\Varid{wrapper}\comp \Varid{worker}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
 \subsection*{Problema 4}
+
+
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{miuaux}\mathbin{::}([\mskip1.5mu (\Varid{a},\Conid{Int})\mskip1.5mu],\Conid{Int})\to [\mskip1.5mu (\Varid{a},\Conid{Int})\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{miuaux}\mathrel{=}\map \;((\Varid{id}\times\uncurry{(\mathbin{*})})\comp \Varid{assocr})\comp \uncurry{\Varid{zip}}\comp (\Varid{id}\times\uncurry{\Varid{replicate}})\comp \Varid{assocr}\comp (\conj{\Varid{id}}{\length }\times\Varid{id}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{miuV}\mathbin{::}\Conid{Vec}\;(\Conid{Vec}\;\Varid{a})\to \Conid{Vec}\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}\Varid{miuV}\mathrel{=}\Conid{V}\comp \Varid{concatMap}\;(\Varid{miuaux}\comp (\Varid{outV}\times\Varid{id}))\comp \Varid{outV}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
 Functor:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1263,7 +1460,7 @@ Functor:
 \>[B]{}\mathbf{instance}\;\Conid{Functor}\;\Conid{Vec}\;\mathbf{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{5}{}\<[5]%
-\>[5]{}\mathsf{fmap}\;\Varid{f}\mathrel{=}\bot {}\<[E]%
+\>[5]{}\mathsf{fmap}\;\Varid{f}\mathrel{=}\Conid{V}\comp \map \;(\Varid{f}\times\Varid{id})\comp \Varid{outV}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 Monad:
@@ -1274,12 +1471,13 @@ Monad:
 \>[B]{}\mathbf{instance}\;\Conid{Monad}\;\Conid{Vec}\;\mathbf{where}{}\<[E]%
 \\
 \>[B]{}\hsindent{4}{}\<[4]%
-\>[4]{}\Varid{x}\bind \Varid{f}\mathrel{=}\bot {}\<[E]%
+\>[4]{}\Varid{x}\bind \Varid{f}\mathrel{=}\Varid{miuV}\;(\mathsf{fmap}\;\Varid{f}\;\Varid{x}){}\<[E]%
 \\
 \>[B]{}\hsindent{4}{}\<[4]%
-\>[4]{}\Varid{return}\mathrel{=}\bot {}\<[E]%
+\>[4]{}\Varid{return}\mathrel{=}\Conid{V}\comp \Varid{singl}\comp \conj{\Varid{id}}{\underline{\mathrm{1}}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
 
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
