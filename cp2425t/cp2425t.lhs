@@ -906,37 +906,238 @@ Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando clar
 
 \subsection*{Problema 2}
 
+Pra resolver este problema foi criado uma estrutura para facilitar a visualização
+da resolução. 
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |A|^* |>< S|
+    \ar@@/^/[r]^-{|outLP|}
+&
+   |1 >< S| + |A|^* | >< (A|^* |>< S)|
+    \ar@@/^/[l]^-{|inLP|}
+}
+\end{eqnarray*}
+
+Tal que o inLP é definido como a construção de uma lista mantendo o valor da segunda 
+componente:
 \begin{code}
- 
-
-auxR :: ((a,s) -> Bool) -> ((a,s) -> (c,s)) -> ([a],([c],s)) -> ([c],s)
-auxR h f =  either (swap . ( id >< uncurry (:) ) . assocr . (swap >< id) . p2) ( swap . (p2 >< id ) . p2) . grd p1 . (h >< (f >< id)) . split (id >< p2) (assocl . (id >< swap)) . (head >< id)
-
-auxL :: ((a,s) -> Bool) -> ((a,s) -> (c,s)) -> ([a],([a],s)) -> ([c],([a],s))
-auxL h f = either ((singl >< id) . p2 ) (( nil >< id) . p2) . grd p1 . (id >< (( id >< swap ) . assocr)) . assocr . (split h f >< id) . assocl . (head >< swap)
-
+inLP = either (nil >< id) ((uncurry (++) >< id) . assocl)
+\end{code}
+E o outLP é definido como uma alternativa entre a primeira componente ser 
+a lista vazia ou não. Assim colocando o unico valor numa lista (para efeitos futuros)
+\begin{code}
 outLP ([],s) = i1 ((),s)
 outLP (h:t,s) = i2 (singl h,(t,s))
+\end{code}
 
+Com o \textit{inLP} e o \textit{outLP} definidos podemos definir o seu funtor recursivo
+e com isso podemos admitir o seu catamorfismo e o seu anamorfismo. 
 
-inLP = either (nil >< id) ((uncurry (++) >< id) . assocl)
+Primeiro fazemos com o catamorfismo, faremos o catamorfismo identidade ou seja 
+sendo seu gene o inLP:
 
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |A|^* |>< S|
+    \ar[r]^-{|outLP|}
+    \ar[d]_-{|f|}
+&
+    |1 >< S| + |A|^* | >< (A|^* |>< S)|
+    \ar[d]^-{|id + (id >< f)|}
+\\
+    |A|^* |>< S|
+&
+    |1 >< S| + |A|^* | >< (A|^* |>< S)|
+    \ar[l]^-{|inLP|}
+}
+\end{eqnarray*}
 
+Podemos ver que está certo pelos tipos e sabemos que vai ser analogo ao anamorfismo,
+e com este diagrama podemos ver claramente o funtor recursivo da estrutura LP
+sendo:
+\begin{code}
 recLP f = id -|- (id >< f)
-
-
+\end{code}
+Com o \textit{recLP}, o \textit{inLP} e o \textit{outLP} ja podemos admitir catamorfismo
+e anamorfismos
+\begin{code}
 cataLP g = g . recLP (cataLP g) . outLP
 
-
 anaLP g = inLP . recLP (anaLP g) . g
-
-hyloLP = cataLP . anaLP
-
+\end{code}
 
 
+Agora facilmente pela ordem natural de computação dos catamorfismos e anamorfismos posso 
+definir as funções mapAccumRfilter e mapAccumLfilter como:
+\begin{code}
 mapAccumRfilter h f = cataLP (either (nil >< id) (auxR h f))
 
-mapAccumLfilter h f = anaLP (((nil >< id) -|- auxL h f) . outLP)
+mapAccumLfilter h f = anaLP ((id -|- auxL h f) . outLP)
+\end{code}
+
+Agora nos falta fazer um simples \cp{Cálculo de Programas} para determinar auxR e auxL
+mas antes fazemos os diagramas para deixar explícito os tipos de ambas as funções 
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |A|^* |>< S|
+    \ar[r]^-{|outLP|}
+    \ar[d]_-{|mapAccumRfilter h f|}
+&
+    |1 >< S| + |A|^* | >< (A|^* |>< S)|
+    \ar[d]^-{|id + (id >< mapAccumRfilter h f)|}
+\\
+    |B|^* |>< S|
+&
+    |1 >< S| + |A|^* | >< (B|^* |>< S)|
+    \ar[l]^-{|either (nil >< id) (auxR h f)|}
+}
+\end{eqnarray*}
+
+tipo de auxR:
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |A|^* | >< (B|^* |>< S)|
+    \ar[r]^-{|auxR h f|}
+&
+    |B|^* |>< S|
+}
+\end{eqnarray*}
+ou em Haskell:
+\begin{code}
+auxR :: ((a,s) -> Bool) -> ((a,s) -> (c,s)) -> ([a],([c],s)) -> ([c],s)
+\end{code}
+
+Agora desenvolveremos o diagrama a partir do tipo inicial tendo em conta as funções
+h (verificação) e f (transformação)
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |A|^* | >< (B|^* |>< S)|
+    \ar[r]^-{|head >< id|}
+&
+    |A >< (B|^* |>< S)|
+    \ar[d]_-{|split (id >< p2) (assocl . (id >< swap))|}
+\\
+&
+    |(A >< S) >< ((A >< S) >< B|^*)
+    \ar[d]_-{|(h >< (f >< id))|}
+\\
+&
+    |2 >< ((B >< S) >< B|^*)
+    \ar[d]_-{|grd p1|}
+\\
+&
+    |2 >< ((B >< S) >< B|^*) + |2 >< ((B >< S) >< B|^*)
+    \ar[ld]_-{|p2|}
+    \ar[rd]^-{|p2|}
+    \ar[dd]_-{|choice|}
+\\
+    |((B >< S) >< B|^*)
+    \ar[rd]_-{|swap . ( id >< uncurry (:) ) . assocr . (swap >< id)|}
+&
+&
+    |((B >< S) >< B|^*)
+    \ar[ld]^-{|swap . (p2 >< id )|}
+\\
+&
+    |B|^* | >< S|
+&
+}
+\end{eqnarray*}
+Temos a definição de auxR:
+\begin{code}
+auxR h f =  choice . grd p1 . (h >< (f >< id)) . split (id >< p2) (assocl . (id >< swap)) . (head >< id) where
+    choice = either (swap . ( id >< uncurry (:) ) . assocr . (swap >< id) . p2) ( swap . (p2 >< id ) . p2)
+\end{code}
+
+Agora faremos parecido para o auxL partindo de um anamorfismo:
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+    |B|^* |>< S|
+&
+&
+    |1 >< S + B|^* |>< (B|^* |>< S)|
+    \ar[ll]_-{|inLP|}
+\\
+|A|^* |>< S|
+\ar[u]^-{|mapAccumLfilter|}
+\ar[r]_-{|outLP|}
+&
+    |1 >< S| + |A|^* | >< (A|^* |>< S)|
+    \ar[r]_-{|id + auxL h f|}
+&
+    |1 >< S| + |C|^* | >< (A|^* |>< S)|
+    \ar[u]_-{|is + (id >< mapAccumLfilter)|}
+}
+\end{eqnarray*}
+
+Sendo então o tipo da função auxL:
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+&
+    |A|^* | >< (A|^* |>< S)|
+    \ar[r]_-{|auxL h f|}
+&
+    |C|^* | >< (A|^* |>< S)|
+}
+\end{eqnarray*}
+
+Em Haskell definido:
+\begin{code}
+auxL :: ((a,s) -> Bool) -> ((a,s) -> (c,s)) -> ([a],([a],s)) -> ([c],([a],s))
+\end{code}
+Agora desenvolveremos o diagrama a partir do tipo inicial tendo em conta as funções
+h (verificação) e f (transformação) pra chegar numa conclusão do codigo do 
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+\\
+    |A >< (S ><| |A|^* |)|
+        \ar[d]^-{|assocl|}
+    &
+    |A|^* |>< (| |A|^* |>< S)|
+        \ar[l]^-{|(head >< swap)|}
+        \ar[rdddd]^-{|auxL h f|}
+\\ 
+    |(A >< S) ><| |A|^*
+        \ar[d]^-{|(split h f >< id)|}
+\\
+    |2 >< (C >< S) ><| |A|^*
+        \ar[d]^-{|assocr|}
+\\ 
+    |2 >< ((C >< S) ><| |A|^* |)|
+        \ar[d]^-{|(id >< (( id >< swap ) . assocr))|}
+\\
+    |2 >< (C >< (| |A|^* |>< S))|
+        \ar[rr]^-{|choice|}
+        \ar[d]^-{|grd p1|}
+&
+&
+    |C|^* |>< (| |A|^* |>< S)|
+\\
+    |2 >< ((C >< S) ><| |A|^* |) + 2 >< ((C >< S) ><| |A|^* |)|
+        \ar[d]^-{|p2 + p2|}
+\\
+    |(C >< S) ><| |A|^*
+        \ar[d]^-{|assocr + assocr|}
+\\ 
+    |C >< (S ><| |A|^* |) + C >< (S ><| |A|^* |)|
+        \ar[d]^-{|( singl >< swap) + (nil >< swap)|}
+\\ 
+    |C|^* |>< (| |A|^* |>< S) +| |C|^* |>< (| |A|^* |>< S)|
+        \ar[r]^-{|either id id|}
+&
+    |C|^* |>< (| |A|^* |>< S)|
+     \ar[ruuuu]^-{|id|}
+}
+\end{eqnarray*}
+
+Com isso finalmente temos a definição do auxL em Haskell:
+\begin{code}
+auxL h f =  choice  . (id >< (( id >< swap ) . assocr)) . assocr . (split h f >< id) . assocl . (head >< swap) where
+    choice = either ((singl >< id) . p2 ) (( nil >< id) . p2) . grd p1
 \end{code}
 
 \subsection*{Problema 3}

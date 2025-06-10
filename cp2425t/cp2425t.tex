@@ -862,7 +862,7 @@ Fórmula (\ref{eq:pi}) em Haskell:
 \subsection*{Problema 4}
 Se pedirmos ao \GHCi\ que nos mostre o vector \ensuremath{\Varid{vec}} obteremos:
 \begin{tabbing}\ttfamily
-~\char123{}~X1~\char124{}\char45{}\char62{}~2~\char44{}~X2~\char124{}\char45{}\char62{}~1~\char125{}
+~\char123{}~X1~\char124{}\char45{}\char62{}~2~\char44{}~X2~\char124{}\char45{}\char62{}~1~\char125{}\char13{}
 \end{tabbing}
 Este resultado aparece mediante a seguinte instância de \ensuremath{\Conid{Vec}} na classe \ensuremath{\Conid{Show}}:
 \begin{hscode}\SaveRestoreHook
@@ -1181,36 +1181,277 @@ Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando clar
 
 \subsection*{Problema 2}
 
+Pra resolver este problema foi criado uma estrutura para facilitar a visualização
+da resolução. 
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S}}
+    \ar@/^/[r]^-{\ensuremath{\Varid{outLP}}}
+&
+   \ensuremath{\mathrm{1}\times\Conid{S}} + \ensuremath{\Conid{A}}^* \ensuremath{\times(\Conid{A}}^* \ensuremath{\times\Conid{S})}
+    \ar@/^/[l]^-{\ensuremath{\Varid{inLP}}}
+}
+\end{eqnarray*}
+
+Tal que o inLP é definido como a construção de uma lista mantendo o valor da segunda 
+componente:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{auxR}\mathbin{::}((\Varid{a},\Varid{s})\to \Conid{Bool})\to ((\Varid{a},\Varid{s})\to (\Varid{c},\Varid{s}))\to ([\mskip1.5mu \Varid{a}\mskip1.5mu],([\mskip1.5mu \Varid{c}\mskip1.5mu],\Varid{s}))\to ([\mskip1.5mu \Varid{c}\mskip1.5mu],\Varid{s}){}\<[E]%
-\\
-\>[B]{}\Varid{auxR}\;\Varid{h}\;\Varid{f}\mathrel{=}{}\<[13]%
-\>[13]{}\alt{\Varid{swap}\comp (\Varid{id}\times\uncurry{(\mathbin{:})})\comp \Varid{assocr}\comp (\Varid{swap}\times\Varid{id})\comp \p2}{\Varid{swap}\comp (\p2\times\Varid{id})\comp \p2}\comp \Varid{grd}\;\p1\comp (\Varid{h}\times(\Varid{f}\times\Varid{id}))\comp \conj{\Varid{id}\times\p2}{\Varid{assocl}\comp (\Varid{id}\times\Varid{swap})}\comp (\Varid{head}\times\Varid{id}){}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{auxL}\mathbin{::}((\Varid{a},\Varid{s})\to \Conid{Bool})\to ((\Varid{a},\Varid{s})\to (\Varid{c},\Varid{s}))\to ([\mskip1.5mu \Varid{a}\mskip1.5mu],([\mskip1.5mu \Varid{a}\mskip1.5mu],\Varid{s}))\to ([\mskip1.5mu \Varid{c}\mskip1.5mu],([\mskip1.5mu \Varid{a}\mskip1.5mu],\Varid{s})){}\<[E]%
-\\
-\>[B]{}\Varid{auxL}\;\Varid{h}\;\Varid{f}\mathrel{=}\alt{(\Varid{singl}\times\Varid{id})\comp \p2}{(\Varid{nil}\times\Varid{id})\comp \p2}\comp \Varid{grd}\;\p1\comp (\Varid{id}\times((\Varid{id}\times\Varid{swap})\comp \Varid{assocr}))\comp \Varid{assocr}\comp (\conj{\Varid{h}}{\Varid{f}}\times\Varid{id})\comp \Varid{assocl}\comp (\Varid{head}\times\Varid{swap}){}\<[E]%
-\\[\blanklineskip]%
+\>[B]{}\Varid{inLP}\mathrel{=}\alt{\Varid{nil}\times\Varid{id}}{(\uncurry{(\mathbin{+\!\!+})}\times\Varid{id})\comp \Varid{assocl}}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+E o outLP é definido como uma alternativa entre a primeira componente ser 
+a lista vazia ou não. Assim colocando o unico valor numa lista (para efeitos futuros)
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{outLP}\;([\mskip1.5mu \mskip1.5mu],\Varid{s})\mathrel{=}i_1\;((),\Varid{s}){}\<[E]%
 \\
 \>[B]{}\Varid{outLP}\;(\Varid{h}\mathbin{:}\Varid{t},\Varid{s})\mathrel{=}i_2\;(\Varid{singl}\;\Varid{h},(\Varid{t},\Varid{s})){}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{inLP}\mathrel{=}\alt{\Varid{nil}\times\Varid{id}}{(\uncurry{(\mathbin{+\!\!+})}\times\Varid{id})\comp \Varid{assocl}}{}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Com o \textit{inLP} e o \textit{outLP} definidos podemos definir o seu funtor recursivo
+e com isso podemos admitir o seu catamorfismo e o seu anamorfismo. 
+
+Primeiro fazemos com o catamorfismo, faremos o catamorfismo identidade ou seja 
+sendo seu gene o inLP:
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S}}
+    \ar[r]^-{\ensuremath{\Varid{outLP}}}
+    \ar[d]_-{\ensuremath{\Varid{f}}}
+&
+    \ensuremath{\mathrm{1}\times\Conid{S}} + \ensuremath{\Conid{A}}^* \ensuremath{\times(\Conid{A}}^* \ensuremath{\times\Conid{S})}
+    \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\times\Varid{f})}}
+\\
+    \ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S}}
+&
+    \ensuremath{\mathrm{1}\times\Conid{S}} + \ensuremath{\Conid{A}}^* \ensuremath{\times(\Conid{A}}^* \ensuremath{\times\Conid{S})}
+    \ar[l]^-{\ensuremath{\Varid{inLP}}}
+}
+\end{eqnarray*}
+
+Podemos ver que está certo pelos tipos e sabemos que vai ser analogo ao anamorfismo,
+e com este diagrama podemos ver claramente o funtor recursivo da estrutura LP
+sendo:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{recLP}\;\Varid{f}\mathrel{=}\Varid{id}+(\Varid{id}\times\Varid{f}){}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+Com o \textit{recLP}, o \textit{inLP} e o \textit{outLP} ja podemos admitir catamorfismo
+e anamorfismos
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{cataLP}\;\Varid{g}\mathrel{=}\Varid{g}\comp \Varid{recLP}\;(\Varid{cataLP}\;\Varid{g})\comp \Varid{outLP}{}\<[E]%
 \\[\blanklineskip]%
 \>[B]{}\Varid{anaLP}\;\Varid{g}\mathrel{=}\Varid{inLP}\comp \Varid{recLP}\;(\Varid{anaLP}\;\Varid{g})\comp \Varid{g}{}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{hyloLP}\mathrel{=}\Varid{cataLP}\comp \Varid{anaLP}{}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+
+Agora facilmente pela ordem natural de computação dos catamorfismos e anamorfismos posso 
+definir as funções mapAccumRfilter e mapAccumLfilter como:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{mapAccumRfilter}\;\Varid{h}\;\Varid{f}\mathrel{=}\Varid{cataLP}\;\alt{\Varid{nil}\times\Varid{id}}{\Varid{auxR}\;\Varid{h}\;\Varid{f}}{}\<[E]%
 \\[\blanklineskip]%
-\>[B]{}\Varid{mapAccumLfilter}\;\Varid{h}\;\Varid{f}\mathrel{=}\Varid{anaLP}\;(((\Varid{nil}\times\Varid{id})+\Varid{auxL}\;\Varid{h}\;\Varid{f})\comp \Varid{outLP}){}\<[E]%
+\>[B]{}\Varid{mapAccumLfilter}\;\Varid{h}\;\Varid{f}\mathrel{=}\Varid{anaLP}\;((\Varid{id}+\Varid{auxL}\;\Varid{h}\;\Varid{f})\comp \Varid{outLP}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Agora nos falta fazer um simples \cp{Cálculo de Programas} para determinar auxR e auxL
+mas antes fazemos os diagramas para deixar explícito os tipos de ambas as funções 
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S}}
+    \ar[r]^-{\ensuremath{\Varid{outLP}}}
+    \ar[d]_-{\ensuremath{\Varid{mapAccumRfilter}\;\Varid{h}\;\Varid{f}}}
+&
+    \ensuremath{\mathrm{1}\times\Conid{S}} + \ensuremath{\Conid{A}}^* \ensuremath{\times(\Conid{A}}^* \ensuremath{\times\Conid{S})}
+    \ar[d]^-{\ensuremath{\Varid{id}\mathbin{+}(\Varid{id}\times\Varid{mapAccumRfilter}\;\Varid{h}\;\Varid{f})}}
+\\
+    \ensuremath{\Conid{B}}^* \ensuremath{\times\Conid{S}}
+&
+    \ensuremath{\mathrm{1}\times\Conid{S}} + \ensuremath{\Conid{A}}^* \ensuremath{\times(\Conid{B}}^* \ensuremath{\times\Conid{S})}
+    \ar[l]^-{\ensuremath{\alt{\Varid{nil}\times\Varid{id}}{\Varid{auxR}\;\Varid{h}\;\Varid{f}}}}
+}
+\end{eqnarray*}
+
+tipo de auxR:
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{A}}^* \ensuremath{\times(\Conid{B}}^* \ensuremath{\times\Conid{S})}
+    \ar[r]^-{\ensuremath{\Varid{auxR}\;\Varid{h}\;\Varid{f}}}
+&
+    \ensuremath{\Conid{B}}^* \ensuremath{\times\Conid{S}}
+}
+\end{eqnarray*}
+ou em Haskell:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{auxR}\mathbin{::}((\Varid{a},\Varid{s})\to \Conid{Bool})\to ((\Varid{a},\Varid{s})\to (\Varid{c},\Varid{s}))\to ([\mskip1.5mu \Varid{a}\mskip1.5mu],([\mskip1.5mu \Varid{c}\mskip1.5mu],\Varid{s}))\to ([\mskip1.5mu \Varid{c}\mskip1.5mu],\Varid{s}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Agora desenvolveremos o diagrama a partir do tipo inicial tendo em conta as funções
+h (verificação) e f (transformação)
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{A}}^* \ensuremath{\times(\Conid{B}}^* \ensuremath{\times\Conid{S})}
+    \ar[r]^-{\ensuremath{\Varid{head}\times\Varid{id}}}
+&
+    \ensuremath{\Conid{A}\times(\Conid{B}}^* \ensuremath{\times\Conid{S})}
+    \ar[d]_-{\ensuremath{\conj{\Varid{id}\times\p2}{\Varid{assocl}\comp (\Varid{id}\times\Varid{swap})}}}
+\\
+&
+    \ensuremath{(\Conid{A}\times\Conid{S})\times((\Conid{A}\times\Conid{S})\times\Conid{B}}^*)
+    \ar[d]_-{\ensuremath{(\Varid{h}\times(\Varid{f}\times\Varid{id}))}}
+\\
+&
+    \ensuremath{\mathrm{2}\times((\Conid{B}\times\Conid{S})\times\Conid{B}}^*)
+    \ar[d]_-{\ensuremath{\Varid{grd}\;\p1}}
+\\
+&
+    \ensuremath{\mathrm{2}\times((\Conid{B}\times\Conid{S})\times\Conid{B}}^*) + \ensuremath{\mathrm{2}\times((\Conid{B}\times\Conid{S})\times\Conid{B}}^*)
+    \ar[ld]_-{\ensuremath{\p2}}
+    \ar[rd]^-{\ensuremath{\p2}}
+    \ar[dd]_-{\ensuremath{\Varid{choice}}}
+\\
+    \ensuremath{((\Conid{B}\times\Conid{S})\times\Conid{B}}^*)
+    \ar[rd]_-{\ensuremath{\Varid{swap}\comp (\Varid{id}\times\uncurry{(\mathbin{:})})\comp \Varid{assocr}\comp (\Varid{swap}\times\Varid{id})}}
+&
+&
+    \ensuremath{((\Conid{B}\times\Conid{S})\times\Conid{B}}^*)
+    \ar[ld]^-{\ensuremath{\Varid{swap}\comp (\p2\times\Varid{id})}}
+\\
+&
+    \ensuremath{\Conid{B}}^* \ensuremath{\times\Conid{S}}
+&
+}
+\end{eqnarray*}
+Temos a definição de auxR:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{auxR}\;\Varid{h}\;\Varid{f}\mathrel{=}{}\<[13]%
+\>[13]{}\Varid{choice}\comp \Varid{grd}\;\p1\comp (\Varid{h}\times(\Varid{f}\times\Varid{id}))\comp \conj{\Varid{id}\times\p2}{\Varid{assocl}\comp (\Varid{id}\times\Varid{swap})}\comp (\Varid{head}\times\Varid{id})\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{choice}\mathrel{=}\alt{\Varid{swap}\comp (\Varid{id}\times\uncurry{(\mathbin{:})})\comp \Varid{assocr}\comp (\Varid{swap}\times\Varid{id})\comp \p2}{\Varid{swap}\comp (\p2\times\Varid{id})\comp \p2}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Agora faremos parecido para o auxL partindo de um anamorfismo:
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\Conid{B}}^* \ensuremath{\times\Conid{S}}
+&
+&
+    \ensuremath{\mathrm{1}\times\Conid{S}\mathbin{+}\Conid{B}}^* \ensuremath{\times(\Conid{B}}^* \ensuremath{\times\Conid{S})}
+    \ar[ll]_-{\ensuremath{\Varid{inLP}}}
+\\
+\ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S}}
+\ar[u]^-{\ensuremath{\Varid{mapAccumLfilter}}}
+\ar[r]_-{\ensuremath{\Varid{outLP}}}
+&
+    \ensuremath{\mathrm{1}\times\Conid{S}} + \ensuremath{\Conid{A}}^* \ensuremath{\times(\Conid{A}}^* \ensuremath{\times\Conid{S})}
+    \ar[r]_-{\ensuremath{\Varid{id}\mathbin{+}\Varid{auxL}\;\Varid{h}\;\Varid{f}}}
+&
+    \ensuremath{\mathrm{1}\times\Conid{S}} + \ensuremath{\Conid{C}}^* \ensuremath{\times(\Conid{A}}^* \ensuremath{\times\Conid{S})}
+    \ar[u]_-{\ensuremath{\Varid{is}\mathbin{+}(\Varid{id}\times\Varid{mapAccumLfilter})}}
+}
+\end{eqnarray*}
+
+Sendo então o tipo da função auxL:
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+&
+    \ensuremath{\Conid{A}}^* \ensuremath{\times(\Conid{A}}^* \ensuremath{\times\Conid{S})}
+    \ar[r]_-{\ensuremath{\Varid{auxL}\;\Varid{h}\;\Varid{f}}}
+&
+    \ensuremath{\Conid{C}}^* \ensuremath{\times(\Conid{A}}^* \ensuremath{\times\Conid{S})}
+}
+\end{eqnarray*}
+
+Em Haskell definido:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{auxL}\mathbin{::}((\Varid{a},\Varid{s})\to \Conid{Bool})\to ((\Varid{a},\Varid{s})\to (\Varid{c},\Varid{s}))\to ([\mskip1.5mu \Varid{a}\mskip1.5mu],([\mskip1.5mu \Varid{a}\mskip1.5mu],\Varid{s}))\to ([\mskip1.5mu \Varid{c}\mskip1.5mu],([\mskip1.5mu \Varid{a}\mskip1.5mu],\Varid{s})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Agora desenvolveremos o diagrama a partir do tipo inicial tendo em conta as funções
+h (verificação) e f (transformação) pra chegar numa conclusão do codigo do 
+
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+\\
+    \ensuremath{\Conid{A}\times(\Conid{S}\times} \ensuremath{\Conid{A}}^* \ensuremath{)}
+        \ar[d]^-{\ensuremath{\Varid{assocl}}}
+    &
+    \ensuremath{\Conid{A}}^* \ensuremath{\times(} \ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S})}
+        \ar[l]^-{\ensuremath{(\Varid{head}\times\Varid{swap})}}
+        \ar[rdddd]^-{\ensuremath{\Varid{auxL}\;\Varid{h}\;\Varid{f}}}
+\\ 
+    \ensuremath{(\Conid{A}\times\Conid{S})\times} \ensuremath{\Conid{A}}^*
+        \ar[d]^-{\ensuremath{(\conj{\Varid{h}}{\Varid{f}}\times\Varid{id})}}
+\\
+    \ensuremath{\mathrm{2}\times(\Conid{C}\times\Conid{S})\times} \ensuremath{\Conid{A}}^*
+        \ar[d]^-{\ensuremath{\Varid{assocr}}}
+\\ 
+    \ensuremath{\mathrm{2}\times((\Conid{C}\times\Conid{S})\times} \ensuremath{\Conid{A}}^* \ensuremath{)}
+        \ar[d]^-{\ensuremath{(\Varid{id}\times((\Varid{id}\times\Varid{swap})\comp \Varid{assocr}))}}
+\\
+    \ensuremath{\mathrm{2}\times(\Conid{C}\times(} \ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S}))}
+        \ar[rr]^-{\ensuremath{\Varid{choice}}}
+        \ar[d]^-{\ensuremath{\Varid{grd}\;\p1}}
+&
+&
+    \ensuremath{\Conid{C}}^* \ensuremath{\times(} \ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S})}
+\\
+    \ensuremath{\mathrm{2}\times((\Conid{C}\times\Conid{S})\times} \ensuremath{\Conid{A}}^* \ensuremath{)\mathbin{+}\mathrm{2}\times((\Conid{C}\times\Conid{S})\times} \ensuremath{\Conid{A}}^* \ensuremath{)}
+        \ar[d]^-{\ensuremath{\p2\mathbin{+}\p2}}
+\\
+    \ensuremath{(\Conid{C}\times\Conid{S})\times} \ensuremath{\Conid{A}}^*
+        \ar[d]^-{\ensuremath{\Varid{assocr}\mathbin{+}\Varid{assocr}}}
+\\ 
+    \ensuremath{\Conid{C}\times(\Conid{S}\times} \ensuremath{\Conid{A}}^* \ensuremath{)\mathbin{+}\Conid{C}\times(\Conid{S}\times} \ensuremath{\Conid{A}}^* \ensuremath{)}
+        \ar[d]^-{\ensuremath{(\Varid{singl}\times\Varid{swap})\mathbin{+}(\Varid{nil}\times\Varid{swap})}}
+\\ 
+    \ensuremath{\Conid{C}}^* \ensuremath{\times(} \ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S})\mathbin{+}} \ensuremath{\Conid{C}}^* \ensuremath{\times(} \ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S})}
+        \ar[r]^-{\ensuremath{\alt{\Varid{id}}{\Varid{id}}}}
+&
+    \ensuremath{\Conid{C}}^* \ensuremath{\times(} \ensuremath{\Conid{A}}^* \ensuremath{\times\Conid{S})}
+     \ar[ruuuu]^-{\ensuremath{\Varid{id}}}
+}
+\end{eqnarray*}
+
+Com isso finalmente temos a definição do auxL em Haskell:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{13}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{21}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{auxL}\;\Varid{h}\;\Varid{f}\mathrel{=}{}\<[13]%
+\>[13]{}\Varid{choice}{}\<[21]%
+\>[21]{}\comp (\Varid{id}\times((\Varid{id}\times\Varid{swap})\comp \Varid{assocr}))\comp \Varid{assocr}\comp (\conj{\Varid{h}}{\Varid{f}}\times\Varid{id})\comp \Varid{assocl}\comp (\Varid{head}\times\Varid{swap})\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{choice}\mathrel{=}\alt{(\Varid{singl}\times\Varid{id})\comp \p2}{(\Varid{nil}\times\Varid{id})\comp \p2}\comp \Varid{grd}\;\p1{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
