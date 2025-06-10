@@ -862,7 +862,7 @@ Fórmula (\ref{eq:pi}) em Haskell:
 \subsection*{Problema 4}
 Se pedirmos ao \GHCi\ que nos mostre o vector \ensuremath{\Varid{vec}} obteremos:
 \begin{tabbing}\ttfamily
-~\char123{}~X1~\char124{}\char45{}\char62{}~2~\char44{}~X2~\char124{}\char45{}\char62{}~1~\char125{}\char13{}
+~\char123{}~X1~\char124{}\char45{}\char62{}~2~\char44{}~X2~\char124{}\char45{}\char62{}~1~\char125{}
 \end{tabbing}
 Este resultado aparece mediante a seguinte instância de \ensuremath{\Conid{Vec}} na classe \ensuremath{\Conid{Show}}:
 \begin{hscode}\SaveRestoreHook
@@ -1014,7 +1014,7 @@ calculamos o maximo
     \ensuremath{\N_0}   
 }
 \end{eqnarray*} 
-Agora precimos de uma função \textit{area} que a partir de um par head e tail faça o calculo 
+Agora precisamos de uma função \textit{area} que a partir de um par head e tail faça o calculo 
 tendo em conta sempre a cabeça
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1686,12 +1686,90 @@ Por fim temos a nossa função feita baseada num \textit{ciclo for}
 \>[B]{}\Varid{miuaux}\mathbin{::}([\mskip1.5mu (\Varid{a},\Conid{Int})\mskip1.5mu],\Conid{Int})\to [\mskip1.5mu (\Varid{a},\Conid{Int})\mskip1.5mu]{}\<[E]%
 \\
 \>[B]{}\Varid{miuaux}\mathrel{=}\map \;((\Varid{id}\times\uncurry{(\mathbin{*})})\comp \Varid{assocr})\comp \uncurry{\Varid{zip}}\comp (\Varid{id}\times\uncurry{\Varid{replicate}})\comp \Varid{assocr}\comp (\conj{\Varid{id}}{\length }\times\Varid{id}){}\<[E]%
-\\[\blanklineskip]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\[
+\centerline{
+    \xymatrix@C=3cm{
+        \ensuremath{(\Conid{A}\times\Conid{Int})\times\Conid{Int}}
+            \ar[d]_-{\ensuremath{\Varid{miuaux}}}
+            \ar[r]^-{\ensuremath{\conj{\Varid{id}}{\length }\times\Varid{id}}}
+    &
+        \ensuremath{(({\Conid{A}\times\Conid{Int}}^{*})\times\N_0)\times\Conid{Int}}
+            \ar[r]^-{\ensuremath{\Varid{assocr}}}
+    &
+        \ensuremath{((\Conid{A}\times{\Conid{Int}}^{*})\times(\N_0\times\Conid{Int}))}
+            \ar[d]^{\ensuremath{(\Varid{id}\times\uncurry{\Varid{replicate}})}}
+    \\
+        \ensuremath{(\Conid{A}\times\Conid{Int})}^*
+    &
+        \ensuremath{((\Conid{A}\times\Conid{Int})\times\Conid{Int})}^*
+        \ar[l]^-{\ensuremath{\map \;((\Varid{id}\times\uncurry{(\mathbin{*})})\comp \Varid{assocr})}}
+    &
+         \ensuremath{({\Conid{A}\times\Conid{Int}}^{*})\times{\Conid{Int}}^{*}}
+            \ar[l]^-{\ensuremath{\uncurry{\Varid{zip}}}}
+    }
+}
+\]
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{miuV}\mathbin{::}\Conid{Vec}\;(\Conid{Vec}\;\Varid{a})\to \Conid{Vec}\;\Varid{a}{}\<[E]%
 \\
 \>[B]{}\Varid{miuV}\mathrel{=}\Conid{V}\comp \Varid{concatMap}\;(\Varid{miuaux}\comp (\Varid{outV}\times\Varid{id}))\comp \Varid{outV}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+\[
+\centerline{
+\xymatrix@C=3cm@R=1.5cm{
+        \ensuremath{\Conid{Vec}\;(\Conid{Vec}\;\Varid{a})}
+            \ar[d]_-{\ensuremath{\Varid{outV}}}
+    \\
+        \ensuremath{[\mskip1.5mu (\Conid{Vec}\;\Varid{a},\Conid{Int})\mskip1.5mu]}
+            \ar[d]_-{\ensuremath{(\Varid{outV}\times\Varid{id})}}
+            \ar@/^2pc/[ddr]^-{\ensuremath{\Varid{concatMap}\;(\Varid{miuaux}\comp (\Varid{outV}\times\Varid{id}))}}
+    \\
+        \ensuremath{[\mskip1.5mu [\mskip1.5mu (\Varid{a},\Conid{Int})\mskip1.5mu]\mskip1.5mu]}
+            \ar[d]_-{\ensuremath{\map \;\Varid{miuaux}}}
+    \\
+        \ensuremath{[\mskip1.5mu [\mskip1.5mu (\Varid{a},\Conid{Int})\mskip1.5mu]\mskip1.5mu]}
+            \ar[r]_-{\ensuremath{\Varid{concat}}}
+    &
+        \ensuremath{[\mskip1.5mu (\Varid{a},\Conid{Int})\mskip1.5mu]}
+            \ar[d]_-{\ensuremath{\Conid{V}}}
+    \\
+    &
+        \ensuremath{\Conid{Vec}\;\Varid{a}}
+    }
+}
+\]
+
+\[
+\centerline{
+    \xymatrix@C=3cm{
+        \ensuremath{\Conid{T}\;\Conid{TA}}
+            \ar[dd]_-{\mu }
+            \ar[r]^-{\ensuremath{\Varid{outV}}}
+    &
+        \ensuremath{(\Conid{TA}\times\Conid{Int})}^*
+            \ar[r]^-{\ensuremath{\map \;(\Varid{outV}\times\Varid{id})}}
+    &
+        \ensuremath{(({\Conid{A}\times\Conid{Int}}^{*})\times\Conid{Int})}^*
+            \ar[dd]^{\ensuremath{\map \;\Varid{aux}}}
+    \\
+    \\
+        \ensuremath{\Varid{x}\mathbin{>==}\Varid{f}\mathrel{=}\Varid{u}\comp (\mathsf{fmap}\;\Varid{x})}
+    &
+        \ensuremath{(\Conid{A}\times\Conid{Int})}^*
+    &
+         \ensuremath{(({\Conid{A}\times\Conid{Int}}^{*})\times\Conid{Int})}^*
+            \ar[l]^-{\ensuremath{\Varid{concat}}}
+    }
+}
+\]
 
 Functor:
 \begin{hscode}\SaveRestoreHook
@@ -1704,6 +1782,26 @@ Functor:
 \>[5]{}\mathsf{fmap}\;\Varid{f}\mathrel{=}\Conid{V}\comp \map \;(\Varid{f}\times\Varid{id})\comp \Varid{outV}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+\[
+\centerline{
+    \xymatrix@C=3cm{
+        \ensuremath{\Conid{TA}}
+        \ar[d]^-{\ensuremath{\Varid{outV}}}
+    \\
+        \ensuremath{(\Conid{A}\times\Conid{Int})}^*
+        \ar[d]^-{\ensuremath{\map \;(\Varid{f}\times\Varid{id})}}
+    \\
+        \ensuremath{(\Conid{B}\times\Conid{Int})}^*
+        \ar[d]^-{\ensuremath{\Conid{V}}}
+    \\
+        \ensuremath{\Conid{TB}}
+    }
+}
+\]
+
+
+
 Monad:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1718,6 +1816,34 @@ Monad:
 \>[4]{}\Varid{return}\mathrel{=}\Conid{V}\comp \Varid{singl}\comp \conj{\Varid{id}}{\underline{\mathrm{1}}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+\[
+\centerline{
+    \xymatrix@C=3cm{
+        \ensuremath{\Conid{T}\;\Conid{TA}}
+        \ar[r]^-{\mu}
+    &
+        \ensuremath{\Conid{TA}}
+    &
+        \ensuremath{\Conid{A}}
+        \ar[l]_-{\ensuremath{\Varid{u}}}
+    }
+}    
+\]
+
+\[
+\centerline{
+    \xymatrix@C=4cm{
+        \ensuremath{\Conid{A}}
+        \ar[d]^-{\ensuremath{\conj{\Varid{id}}{\underline{\mathrm{1}}}}}
+    \\
+        \ensuremath{(\Conid{A}\times\underline{\mathrm{1}})}
+        \ar[d]^-{\ensuremath{\Varid{singl}}}
+    \\
+        \ensuremath{[\mskip1.5mu (\Conid{A}\times\mathrm{1})\mskip1.5mu]}
+    }
+}
+\]
 
 
 

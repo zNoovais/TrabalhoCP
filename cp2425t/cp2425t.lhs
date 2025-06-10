@@ -203,6 +203,9 @@ import System.Process
 import Data.Char
 import Data.Matrix
 import Control.Concurrent
+import Cp (assocr, mult)
+import Data.Tuple (uncurry)
+import Control.Arrow (ArrowChoice(left, right))
 
 
 
@@ -744,7 +747,7 @@ calculamos o maximo
     |Nat0|   
 }
 \end{eqnarray*} 
-Agora precimos de uma função \textit{area} que a partir de um par head e tail faça o calculo 
+Agora precisamos de uma função \textit{area} que a partir de um par head e tail faça o calculo 
 tendo em conta sempre a cabeça
 \begin{code}
 area :: (Int,[Int]) -> Int
@@ -1368,22 +1371,145 @@ piloop = wrapper . worker
 \begin{code}
 miuaux :: ([(a,Int)],Int) -> [(a,Int)]
 miuaux = map ((id >< uncurry (*)) . assocr). uncurry zip . (id >< uncurry replicate) . assocr . (split id length >< id)
+\end{code}
 
+\[
+\centerline{
+    \xymatrix@@C=3cm{
+        |(A >< Int) >< Int|
+            \ar[d]_-{|miuaux|}
+            \ar[r]^-{| split id (length) >< id|}
+    &
+        |(((Seq (A >< Int))) >< Nat0) >< Int|
+            \ar[r]^-{|assocr|}
+    &
+        |((A >< Seq Int) >< (Nat0 >< Int))|
+            \ar[d]^{|(id >< uncurry replicate)|}
+    \\
+        |(A >< Int)|^*
+    &
+        |((A >< Int) >< Int)|^*
+        \ar[l]^-{|map((id >< uncurry(*)) . assocr)|}
+    &
+         |((Seq (A >< Int))) >< Seq Int|
+            \ar[l]^-{|uncurry zip|}
+    }
+}
+\]
+
+\begin{code}
 miuV :: Vec (Vec a) -> Vec a
 miuV = V . concatMap (miuaux . (outV >< id)) . outV
 \end{code}
+
+\[
+\centerline{
+\xymatrix@@C=3cm@@R=1.5cm{
+        |Vec (Vec a)|
+            \ar[d]_-{|outV|}
+    \\
+        |[(Vec a, Int)]|
+            \ar[d]_-{|(outV >< id)|}
+            \ar@@/^2pc/[ddr]^-{|concatMap (miuaux . (outV >< id))|}
+    \\
+        |[[(a, Int)]]|
+            \ar[d]_-{|map miuaux|}
+    \\
+        |[[(a, Int)]]|
+            \ar[r]_-{|concat|}
+    &
+        |[(a, Int)]|
+            \ar[d]_-{|V|}
+    \\
+    &
+        |Vec a|
+    }
+}
+\]
+
+\[
+\centerline{
+    \xymatrix@@C=3cm{
+        |T TA|
+            \ar[dd]_-{\mu }
+            \ar[r]^-{|outV|}
+    &
+        |(TA >< Int)|^*
+            \ar[r]^-{|map(outV >< id)|}
+    &
+        |(((Seq (A >< Int))) >< Int)|^*
+            \ar[dd]^{|map aux|}
+    \\
+    \\
+        |x>==f=u . (fmap x)|
+    &
+        |(A >< Int)|^*
+    &
+         |(((Seq(A >< Int))) >< Int)|^*
+            \ar[l]^-{|concat|}
+    }
+}
+\]
 
 Functor:
 \begin{code}
 instance Functor Vec where
     fmap f = V . map (f >< id) . outV
 \end{code}
+
+\[
+\centerline{
+    \xymatrix@@C=3cm{
+        |TA|
+        \ar[d]^-{|outV|}
+    \\
+        |(A >< Int)|^*
+        \ar[d]^-{|map(f >< id)|}
+    \\
+        |(B >< Int)|^*
+        \ar[d]^-{|V|}
+    \\
+        |TB|
+    }
+}
+\]
+
+
+
 Monad:
 \begin{code}
 instance Monad Vec where
    x >>= f = miuV (fmap f x)
    return = V . singl . split id (const 1)
 \end{code}
+
+\[
+\centerline{
+    \xymatrix@@C=3cm{
+        |T TA|
+        \ar[r]^-{\mu}
+    &
+        |TA|
+    &
+        |A|
+        \ar[l]_-{|u|}
+    }
+}    
+\]
+
+\[
+\centerline{
+    \xymatrix@@C=4cm{
+        |A|
+        \ar[d]^-{|split id (const 1)|}
+    \\
+        |(A >< const 1)|
+        \ar[d]^-{|singl|}
+    \\
+        |[(A >< 1)]|
+    }
+}
+\]
 
 
 

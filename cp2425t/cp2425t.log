@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.5.20)  10 JUN 2025 19:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.5.25)  10 JUN 2025 22:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1638,19 +1638,28 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 
 \openout7 = `cp2425t.ptb'.
 
+ <xymatrix 3x2 287>
 \openout7 = `cp2425t.ptb'.
 
-\openout7 = `cp2425t.ptb'.
-
- (./cp2425t.ind
+ <xymatrix 2x5 301>
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[17] [18
+[17] <xymatrix 3x3 247>
+\openout7 = `cp2425t.ptb'.
 
+ <xymatrix 1x4 150>
+\openout7 = `cp2425t.ptb'.
 
-]) (./cp2425t.bbl
+ <xymatrix 3x1 102>
+Overfull \hbox (128.0374pt too wide) has occurred while \output is active
+ [][]| 
+ []
+
+[18] <xymatrix 1x3 102>
+No file cp2425t.ind.
+(./cp2425t.bbl
 
 LaTeX Font Warning: Font shape `T1/PTSans-TLF/m/sc' undefined
 (Font)              using `T1/PTSans-TLF/m/n' instead on input line 26.
@@ -1660,9 +1669,7 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[19
-
-] (./cp2425t.aux)
+[19] (./cp2425t.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-01-22>
@@ -1675,10 +1682,10 @@ Package rerunfilecheck Info: File `cp2425t.out' has not changed.
 (rerunfilecheck)             Checksum: 5F452AB781E4B92AEB3757E0DDBE6DE1;1503.
  ) 
 Here is how much of TeX's memory you used:
- 47963 strings out of 476106
- 1048630 string characters out of 5793933
+ 47959 strings out of 476106
+ 1048580 string characters out of 5793933
  1949975 words of memory out of 5000000
- 69238 multiletter control sequences out of 15000+600000
+ 69237 multiletter control sequences out of 15000+600000
  888520 words of font info for 189 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
  99i,19n,101p,3281b,844s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1707,10 +1714,10 @@ msbm10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/stmaryrd/stmary10.
 pfb></usr/share/texlive/texmf-dist/fonts/type1/public/stmaryrd/stmary9.pfb></us
 r/share/texlive/texmf-dist/fonts/type1/public/xypic/xyatip10.pfb></usr/share/te
 xlive/texmf-dist/fonts/type1/public/xypic/xybtip10.pfb>
-Output written on cp2425t.pdf (20 pages, 752339 bytes).
+Output written on cp2425t.pdf (20 pages, 753221 bytes).
 PDF statistics:
- 429 PDF objects out of 1000 (max. 8388607)
- 342 compressed objects within 4 object streams
+ 397 PDF objects out of 1000 (max. 8388607)
+ 310 compressed objects within 4 object streams
  43 named destinations out of 1000 (max. 500000)
  112 words of extra memory for PDF output out of 10000 (max. 10000000)
 
