@@ -944,10 +944,10 @@ sendo seu gene o inLP:
 \xymatrix@@C=2cm{
     |A|^* |>< S|
     \ar[r]^-{|outLP|}
-    \ar[d]_-{|f|}
+    \ar[d]_-{|cataid|}
 &
     |1 >< S| + |A|^* | >< (A|^* |>< S)|
-    \ar[d]^-{|id + (id >< f)|}
+    \ar[d]^-{|id + (id >< cataid)|}
 \\
     |A|^* |>< S|
 &
@@ -1096,7 +1096,6 @@ h (verificação) e f (transformação) pra chegar numa conclusão do codigo do
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
-\\
     |A >< (S ><| |A|^* |)|
         \ar[d]^-{|assocl|}
     &
@@ -1366,101 +1365,23 @@ piloop = wrapper . worker
 
 \subsection*{Problema 4}
 
+Primeiro resolvendo o functor que se aplica em Vec terá os tipos:
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+&
+    |Vec A|
+    \ar[r]^-{|fmap f|}
+&
+    |Vec B|
+}
+\end{eqnarray*}
 
-
-\begin{code}
-miuaux :: ([(a,Int)],Int) -> [(a,Int)]
-miuaux = map ((id >< uncurry (*)) . assocr). uncurry zip . (id >< uncurry replicate) . assocr . (split id length >< id)
-\end{code}
+Portanto facilmente chegamos numa definição deste functor explicita neste diagrama:
 
 \[
 \centerline{
     \xymatrix@@C=3cm{
-        |(A >< Int) >< Int|
-            \ar[d]_-{|miuaux|}
-            \ar[r]^-{| split id (length) >< id|}
-    &
-        |(((Seq (A >< Int))) >< Nat0) >< Int|
-            \ar[r]^-{|assocr|}
-    &
-        |((A >< Seq Int) >< (Nat0 >< Int))|
-            \ar[d]^{|(id >< uncurry replicate)|}
-    \\
-        |(A >< Int)|^*
-    &
-        |((A >< Int) >< Int)|^*
-        \ar[l]^-{|map((id >< uncurry(*)) . assocr)|}
-    &
-         |((Seq (A >< Int))) >< Seq Int|
-            \ar[l]^-{|uncurry zip|}
-    }
-}
-\]
-
-\begin{code}
-miuV :: Vec (Vec a) -> Vec a
-miuV = V . concatMap (miuaux . (outV >< id)) . outV
-\end{code}
-
-\[
-\centerline{
-\xymatrix@@C=3cm@@R=1.5cm{
-        |Vec (Vec a)|
-            \ar[d]_-{|outV|}
-    \\
-        |[(Vec a, Int)]|
-            \ar[d]_-{|(outV >< id)|}
-            \ar@@/^2pc/[ddr]^-{|concatMap (miuaux . (outV >< id))|}
-    \\
-        |[[(a, Int)]]|
-            \ar[d]_-{|map miuaux|}
-    \\
-        |[[(a, Int)]]|
-            \ar[r]_-{|concat|}
-    &
-        |[(a, Int)]|
-            \ar[d]_-{|V|}
-    \\
-    &
-        |Vec a|
-    }
-}
-\]
-
-\[
-\centerline{
-    \xymatrix@@C=3cm{
-        |T TA|
-            \ar[dd]_-{\mu }
-            \ar[r]^-{|outV|}
-    &
-        |(TA >< Int)|^*
-            \ar[r]^-{|map(outV >< id)|}
-    &
-        |(((Seq (A >< Int))) >< Int)|^*
-            \ar[dd]^{|map aux|}
-    \\
-    \\
-        |x>==f=u . (fmap x)|
-    &
-        |(A >< Int)|^*
-    &
-         |(((Seq(A >< Int))) >< Int)|^*
-            \ar[l]^-{|concat|}
-    }
-}
-\]
-
-Functor:
-\begin{code}
-instance Functor Vec where
-    fmap f = V . map (f >< id) . outV
-\end{code}
-
-\[
-\centerline{
-    \xymatrix@@C=3cm{
-        |TA|
+        |Vec A|
         \ar[d]^-{|outV|}
     \\
         |(A >< Int)|^*
@@ -1469,12 +1390,119 @@ instance Functor Vec where
         |(B >< Int)|^*
         \ar[d]^-{|V|}
     \\
-        |TB|
+        |Vec B|
     }
 }
 \]
 
+e em Haskell como:
 
+\begin{code}
+instance Functor Vec where
+    fmap f = V . map (f >< id) . outV
+\end{code}
+
+Agora temos que definir o (>>=) e o return deste Monad, para tal efeito precisaremos
+de ter ${\mu}$ para a facilitação de cálculos e completude do problema.
+
+Nosso ${\mu}$ terá obviamente os tipos:
+
+\begin{eqnarray*}
+\xymatrix@@C=2cm{
+&
+    |Vec (Vec A)|
+    \ar[r]^-{\mu}
+&
+    |Vec A|
+}
+\end{eqnarray*}
+
+partiremos então com a resolução do diagrama nomeando nossa função ${\mu}$ como 
+\textit{miuV}:
+\[
+\centerline{
+\xymatrix@@C=3cm@@R=1.5cm{
+        |Vec (Vec A)|
+            \ar[d]_-{|outV|}
+    \\
+        |(Vec A >< Int)|^*
+            \ar[d]_-{|(outV >< id)|}
+            \ar@@/^2pc/[ddr]^-{|concatMap (miuaux . (outV >< id))|}
+    \\
+        |((A >< Int)|^*| >< Int)|^*
+            \ar[d]_-{|map miuaux|}
+    \\
+        |(A >< Int)|^{*^*}
+            \ar[r]_-{|concat|}
+    &
+        (|A >< Int|)^*
+            \ar[d]_-{|V|}
+    \\
+    &
+        |Vec A|
+    }
+}
+\]
+
+também teremos que fazer o \textit{miuaux} que fará a multiplicação de todos os 
+elementos do vetor associado ao número.
+
+\begin{code}
+miuaux :: ([(a,Int)],Int) -> [(a,Int)]
+\end{code}
+
+\begin{eqnarray*}
+    \xymatrix@@C=3cm{
+        |(A >< Int)|^* | >< Int|
+            \ar[d]_-{|miuaux|}
+            \ar[r]^-{| split id (length) >< id|}
+    &
+        |((A >< Int)|^* |>< Nat0) >< Int|
+            \ar[r]^-{|assocr|}
+    &
+        |(A >< Int)|^* | >< (Nat0 >< Int)|
+            \ar[d]^{|(id >< uncurry replicate)|}
+    \\
+        |(A >< Int)|^*
+    &
+        |((A >< Int) >< Int)|^*
+        \ar[l]^-{|map((id >< uncurry(*)) . assocr)|}
+    &
+         |(A >< Int)|^* | >< Int|^*
+            \ar[l]^-{|uncurry zip|}
+    }
+\end{eqnarray*}
+
+Temos agora definido as duas funções em haskell.
+\begin{code}
+miuaux = map ((id >< uncurry (*)) . assocr). uncurry zip . (id >< uncurry replicate) . assocr . (split id length >< id)
+
+miuV :: Vec (Vec a) -> Vec a
+miuV = V . concatMap (miuaux . (outV >< id)) . outV
+\end{code}
+
+Agora com o \textit{miuV} definido podemos facilmente calcular (x >>= f) de acordo com a
+(88) do formulário de \cp{Cálculo de Programas} 
+
+\begin{eqnarray*}
+\start
+| x >>= f = (|\mu| . T f)x|
+\just\equiv{|substituindo pelo o nosso contexto|}
+|
+    x >>= f = (miuV . fmap f) x
+|
+\end{eqnarray*}
+
+Agora nos falta calcular o return. Sabemos que miuV . return = id então o return será 
+
+\begin{eqnarray*}
+\start
+| return = V . singl . split id (const 1)|
+\end{eqnarray*}
+
+Associamos ao numero 1 pois 1 é o elemento neutro da multiplicação então quando aplicamos
+miuv isto multiplica todos os elementos por 1 resultando no mesmo vetor. 
+Exprimos em haskell o \textit{binding} e o \textit{return} como:
 
 Monad:
 \begin{code}
@@ -1482,36 +1510,6 @@ instance Monad Vec where
    x >>= f = miuV (fmap f x)
    return = V . singl . split id (const 1)
 \end{code}
-
-\[
-\centerline{
-    \xymatrix@@C=3cm{
-        |T TA|
-        \ar[r]^-{\mu}
-    &
-        |TA|
-    &
-        |A|
-        \ar[l]_-{|u|}
-    }
-}    
-\]
-
-\[
-\centerline{
-    \xymatrix@@C=4cm{
-        |A|
-        \ar[d]^-{|split id (const 1)|}
-    \\
-        |(A >< const 1)|
-        \ar[d]^-{|singl|}
-    \\
-        |[(A >< 1)]|
-    }
-}
-\]
-
-
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
 
