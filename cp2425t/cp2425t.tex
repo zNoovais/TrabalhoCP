@@ -961,11 +961,13 @@ que sejam necessárias.
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
 
 \subsection*{Problema 1}
+O Problema 1 foi resolvido utilizando um \textit{hilomorfismo}, 
+que consiste em um \textit{anamorfismo} que "faz pouco" e um 
+\textit{catamorfismo} que "faz muito" — ou seja, uma abordagem do 
+tipo \textit{Easy Split / Hard Join}.
 
-O problema 1 foi resolvido usando um hilomorfismo que consiste num anamorfismo
-que "faz pouco" e um catarmorfismo que "faz muito" ou seja um Easy Split/Hard Join.
+Começamos com o \textit{anamorfismo}:
 
-começamos com o anamorfismo:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -976,8 +978,9 @@ começamos com o anamorfismo:
 \ColumnHook
 \end{hscode}\resethooks
 
-Agora podemos começar com a cabeça de cada sub-lista e fazer uma procura exaustiva pela 
-lista de listas
+De seguida, podemos começar pela cabeça de cada 
+sublista e realizar uma busca exaustiva na lista de listas.
+
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
@@ -992,8 +995,9 @@ lista de listas
 }
 \end{eqnarray*}
 
-No final ao fazer a procura e o calculo todo em todas as sublistas fazemos o catamorfismo
-mymaximum que retira o maior elemento de uma lista
+No final, após realizar a procura e o cálculo em todas as sublistas, 
+aplicamos o \textit{catamorfismo} \textit{mymaximum}, que extrai o maior
+ elemento de uma lista.
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1003,8 +1007,8 @@ mymaximum que retira o maior elemento de uma lista
 \>[B]{}\Varid{mymaximum}\mathrel{=}\llparenthesis\, \alt{\underline{\mathrm{0}}}{\uncurry{\Varid{max}}}\,\rrparenthesis{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-que de todas as sublistas calculadas a área maxima temos uma lista de áreas maximas então 
-calculamos o maximo 
+Como de cada sublista calculada obtemos a área máxima, 
+ficamos com uma lista de áreas máximas. Assim, aplicamos o cálculo do máximo sobre essa lista.
 \begin{eqnarray*}
 \xymatrix@C=2cm{
 &
@@ -1014,8 +1018,10 @@ calculamos o maximo
     \ensuremath{\N_0}   
 }
 \end{eqnarray*} 
-Agora precisamos de uma função \textit{area} que a partir de um par head e tail faça o calculo 
-tendo em conta sempre a cabeça
+\textbf{Neste passo}, necessitamos de uma função \textit{area}
+ que, a partir de um par \textit{head} e \textit{tail}, efectue o cálculo tendo 
+ sempre em conta a cabeça.
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1051,19 +1057,20 @@ tendo em conta sempre a cabeça
     \ar[uuu]_-{\ensuremath{\Varid{mymaximum}}} 
 }
 \end{eqnarray*}
-
-Onde temos como função auxiliar \textit{auxarea} que faz o calculo e a alternativa 
-qual dos extremos é o menor pra calcular a área.
+Temos como função auxiliar a \textit{auxarea}, que efectua o cálculo e 
+determina qual dos extremos é o menor para calcular a área.
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{auxarea}\mathbin{::}(\Conid{Int},(\Conid{Int},\Conid{Int}))\to \Conid{Int}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-Quero lembrar que o do par \ensuremath{\N_0\times(\N_0\times\N_0)} a \textbf{primeira componente} é a head ou seja uma 
-das alturas que estamos a calcular, a \textbf{segunda componente} é a segunda altura e por fim a 
-\textbf{ultima componente} é a respetiva distância entre as duas alturas. Agora basta verificar qual das 
-alturas é a menor e multiplicar pela distância.
+
+Recordo que, no par \ensuremath{\N_0\times(\N_0\times\N_0)}, a \textbf{primeira componente} é a 
+\textit{head}, ou seja, uma das alturas que estamos a calcular; a \textbf{segunda componente} 
+é a segunda altura; e, por fim, a \textbf{última componente} é a respetiva distância entre as 
+duas alturas. Basta agora verificar qual das alturas é a menor e multiplicar pela distância.
+
 \begin{eqnarray*}
 \xymatrix@C=2cm{
     \ensuremath{\N_0\times(\N_0\times\N_0)}
@@ -1083,8 +1090,7 @@ alturas é a menor e multiplicar pela distância.
 &  
 }
 \end{eqnarray*}
-
-Agora podemos exprimir \textit{area} e \textit{auxarea} em Haskell como:
+Podemos agora exprimir as funções \textit{area} e \textit{auxarea} em \Haskell\ da seguinte forma:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{109}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1095,9 +1101,7 @@ Agora podemos exprimir \textit{area} e \textit{auxarea} em Haskell como:
 \>[109]{}\comp (\Varid{id}\times\map \;\Varid{swap}\comp \Varid{zip}\;[\mskip1.5mu \mathrm{1}\mathinner{\ldotp\ldotp}\mskip1.5mu]){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-
-Finalmente temos uma definição para o mostwater que pode ser expressa neste diagrama:
-
+Finalmente, temos uma definição para o \textit{mostwater}, que pode ser representada no seguinte diagrama:
 \begin{eqnarray*}
 \xymatrix@C=2cm{
 &
@@ -1119,10 +1123,10 @@ Finalmente temos uma definição para o mostwater que pode ser expressa neste di
     \ensuremath{\N_0}
 }
 \end{eqnarray*}
+Para transformar num hilomorfismo de listas, podemos utilizar algumas leis 
+do \cp{Cálculo de Programas}, nomeadamente a 
+\textit{Composição de maps} e a \textit{Absorção-Cata}.
 
-Claro que para transformar num hylomorfismo de listas podemos utilizar algumas leis
-do \cp{Cálculo de Programas} nomeadamente a \textit{Composição de maps} e a 
-\textit{Absorção-Cata}
 \begin{eqnarray*}
 \start
 \ensuremath{\Varid{mostwater}\mathrel{=}\Varid{mymaximum}\comp \map \;\Varid{area}\comp \map \;\conj{\Varid{head}}{\Varid{tail}}\comp \Varid{mysuffixes}}
@@ -1136,7 +1140,7 @@ do \cp{Cálculo de Programas} nomeadamente a \textit{Composição de maps} e a
 \ensuremath{\Varid{mostwater}\mathrel{=}\llparenthesis\, \alt{\underline{\mathrm{0}}}{\uncurry{\Varid{max}}\comp ((\Varid{area}\comp \conj{\Varid{head}}{\Varid{tail}})\times\Varid{id})}\,\rrparenthesis\comp \anaList{(\Varid{id}\mathbin{+}\conj{\Varid{cons}}{\p2})\comp \Varid{outList}}}
 \qed
 \end{eqnarray*}
-Temos a definição de mostwater como um hylomorfismo:
+Temos a definição de \textit{mostwater} como um \textit{hilomorfismo}:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{91}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1145,8 +1149,9 @@ Temos a definição de mostwater como um hylomorfismo:
 \>[91]{}((\Varid{id}+\conj{\Varid{cons}}{\p2})\comp \Varid{outList}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando claro o seu 
-\textit{divide} e o seu \textit{conquer} também expondo a sua estrutura intermediária: 
+Podemos agora exprimir o \textit{mostwater} no seu diagrama de \textit{hilomorfismo}, 
+evidenciando o seu \textit{divide} e o seu \textit{conquer}, bem como explicitando a sua 
+estrutura intermédia:
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
@@ -1181,8 +1186,8 @@ Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando clar
 
 \subsection*{Problema 2}
 
-Pra resolver este problema foi criado uma estrutura para facilitar a visualização
-da resolução. 
+Para resolver este problema, foi criada uma estrutura que facilita a visualização da solução.
+
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
@@ -1193,17 +1198,18 @@ da resolução.
     \ar@/^/[l]^-{\ensuremath{\Varid{inLP}}}
 }
 \end{eqnarray*}
+Tal que o \textit{inLP} é definido como a construção
+ de uma lista, mantendo o valor da segunda componente:
 
-Tal que o inLP é definido como a construção de uma lista mantendo o valor da segunda 
-componente:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{inLP}\mathrel{=}\alt{\Varid{nil}\times\Varid{id}}{(\uncurry{(\mathbin{+\!\!+})}\times\Varid{id})\comp \Varid{assocl}}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-E o outLP é definido como uma alternativa entre a primeira componente ser 
-a lista vazia ou não. Assim colocando o unico valor numa lista (para efeitos futuros)
+O \textit{outLP} é definido como uma alternativa entre a primeira componente 
+ser a lista vazia ou não, colocando assim o único valor numa lista.
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1213,11 +1219,12 @@ a lista vazia ou não. Assim colocando o unico valor numa lista (para efeitos fu
 \ColumnHook
 \end{hscode}\resethooks
 
-Com o \textit{inLP} e o \textit{outLP} definidos podemos definir o seu funtor recursivo
-e com isso podemos admitir o seu catamorfismo e o seu anamorfismo. 
+Com o \textit{inLP} e o \textit{outLP} definidos, 
+podemos definir o seu functor recursivo, o que nos 
+permite admitir o seu \textit{catamorfismo} e o seu \textit{anamorfismo}.
 
-Primeiro fazemos com o catamorfismo, faremos o catamorfismo identidade ou seja 
-sendo seu gene o inLP:
+Começamos pelo \textit{catamorfismo}, 
+concretamente o \textit{catamorfismo} identidade, sendo o seu gerador o \textit{inLP}:
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
@@ -1235,9 +1242,10 @@ sendo seu gene o inLP:
 }
 \end{eqnarray*}
 
-Podemos ver que está certo pelos tipos e sabemos que vai ser analogo ao anamorfismo,
-e com este diagrama podemos ver claramente o funtor recursivo da estrutura LP
-sendo:
+A correção pode ser confirmada pela análise dos tipos, sabendo-se que esta é análoga ao \textit{anamorfismo}. 
+O presente diagrama possibilita a visualização clara do funtor recursivo da estrutura \textbf{LP}, 
+definido como:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1255,9 +1263,9 @@ e anamorfismos
 \ColumnHook
 \end{hscode}\resethooks
 
+Agora, pela ordem natural de \textbf{computação} dos \textit{catamorfismos} e \textit{anamorfismos}, 
+podemos definir as funções \textit{mapAccumRfilter} e \textit{mapAccumLfilter} da seguinte forma:
 
-Agora facilmente pela ordem natural de computação dos catamorfismos e anamorfismos posso 
-definir as funções mapAccumRfilter e mapAccumLfilter como:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1267,8 +1275,10 @@ definir as funções mapAccumRfilter e mapAccumLfilter como:
 \ColumnHook
 \end{hscode}\resethooks
 
-Agora nos falta fazer um simples \cp{Cálculo de Programas} para determinar auxR e auxL
-mas antes fazemos os diagramas para deixar explícito os tipos de ambas as funções 
+Faltam ainda alguns passos de \textbf{cálculo}
+para determinar as funções \textit{auxR} e \textit{auxL}. 
+Antes disso, apresentam-se os diagramas que explicitam os tipos de ambas as funções.
+
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
@@ -1295,7 +1305,7 @@ tipo de auxR:
     \ensuremath{\Conid{B}}^* \ensuremath{\times\Conid{S}}
 }
 \end{eqnarray*}
-ou em Haskell:
+ou em \Haskell:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1303,8 +1313,8 @@ ou em Haskell:
 \ColumnHook
 \end{hscode}\resethooks
 
-Agora desenvolveremos o diagrama a partir do tipo inicial tendo em conta as funções
-h (verificação) e f (transformação)
+Segue-se o desenvolvimento do diagrama a partir do tipo inicial, 
+tendo em conta as funções \textit{h} (verificação) e \textit{f} (transformação).
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
@@ -1340,7 +1350,7 @@ h (verificação) e f (transformação)
 &
 }
 \end{eqnarray*}
-Temos a definição de auxR:
+Apresenta-se a definição de \textit{auxR}:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1353,8 +1363,8 @@ Temos a definição de auxR:
 \>[5]{}\Varid{choice}\mathrel{=}\alt{\Varid{swap}\comp (\Varid{id}\times\uncurry{(\mathbin{:})})\comp \Varid{assocr}\comp (\Varid{swap}\times\Varid{id})\comp \p2}{\Varid{swap}\comp (\p2\times\Varid{id})\comp \p2}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+Segue-se uma definição análoga para \textit{auxL}, partindo de um \textit{anamorfismo}:
 
-Agora faremos parecido para o auxL partindo de um anamorfismo:
 \begin{eqnarray*}
 \xymatrix@C=2cm{
     \ensuremath{\Conid{B}}^* \ensuremath{\times\Conid{S}}
@@ -1375,7 +1385,8 @@ Agora faremos parecido para o auxL partindo de um anamorfismo:
 }
 \end{eqnarray*}
 
-Sendo então o tipo da função auxL:
+Considera-se, então, o tipo da função \textit{auxL}:
+
 \begin{eqnarray*}
 \xymatrix@C=2cm{
 &
@@ -1385,16 +1396,18 @@ Sendo então o tipo da função auxL:
     \ensuremath{\Conid{C}}^* \ensuremath{\times(\Conid{A}}^* \ensuremath{\times\Conid{S})}
 }
 \end{eqnarray*}
+Definido em \Haskell\ como:
 
-Em Haskell definido:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{auxL}\mathbin{::}((\Varid{a},\Varid{s})\to \Conid{Bool})\to ((\Varid{a},\Varid{s})\to (\Varid{c},\Varid{s}))\to ([\mskip1.5mu \Varid{a}\mskip1.5mu],([\mskip1.5mu \Varid{a}\mskip1.5mu],\Varid{s}))\to ([\mskip1.5mu \Varid{c}\mskip1.5mu],([\mskip1.5mu \Varid{a}\mskip1.5mu],\Varid{s})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-Agora desenvolveremos o diagrama a partir do tipo inicial tendo em conta as funções
-h (verificação) e f (transformação) pra chegar numa conclusão do codigo do 
+
+Segue-se o desenvolvimento do diagrama a partir do tipo inicial, tendo em conta as 
+funções \textit{h} (verificação) e \textit{f} (transformação), com o objetivo de 
+alcançar uma conclusão para o código da função \textit{auxL}
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
@@ -1437,8 +1450,7 @@ h (verificação) e f (transformação) pra chegar numa conclusão do codigo do
      \ar[ruuuu]^-{\ensuremath{\Varid{id}}}
 }
 \end{eqnarray*}
-
-Com isso finalmente temos a definição do auxL em Haskell:
+Desta forma, obtém-se finalmente a definição de \textit{auxL} em \Haskell:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1455,10 +1467,10 @@ Com isso finalmente temos a definição do auxL em Haskell:
 \end{hscode}\resethooks
 
 \subsection*{Problema 3}
+O Problema 3 foi resolvido por recursividade mútua, tendo como objetivo 
+definir as funções que realizam chamadas recursivas mútuas entre si. Para tal, 
+é necessária a forma recursiva do somatório em \Haskell.
 
-O problema 3 foi resolvido por recursividade mutua, primeiro como objetivo:
-definir as funçoes que mutuamente realizam chamadas recursivas entre si. 
-    Para isto precisamos da forma recursiva do somatorio em haskell
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1469,9 +1481,10 @@ definir as funçoes que mutuamente realizam chamadas recursivas entre si.
 \>[B]{}\Varid{picalcRec}\;\Varid{n}\mathrel{=}\Varid{fromIntegral}\;(\Varid{\Conid{Nat}.fac}\;\Varid{n})\mathbin{\uparrow}\mathrm{2}\mathbin{*}\mathrm{2}\mathbin{\uparrow}(\Varid{n}\mathbin{+}\mathrm{1})\mathbin{/}\Varid{fromIntegral}\;(\Varid{\Conid{Nat}.fac}\;(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1}))\mathbin{+}\pi_{\mathit{calc}}\;(\Varid{n}\mathbin{-}\mathrm{1}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-Podemos ver que nesta definição há várias dependencia de n, temos que aplicar a 
-\textit{regra da algibeira} para cada ocorrencia, ou seja, para cada ocorrencia
-de n temos que associar a outra função qualquer f (n-1)
+
+Como nesta definição existem várias dependências de \(n\), surge a 
+necessidade de aplicar a \textit{regra da algibeira}. Assim, para cada 
+ocorrência de \(n\), devemos associar uma função qualquer \(f(n-1)\).
 
 \begin{eqnarray*}
 \start
@@ -1486,8 +1499,9 @@ de n temos que associar a outra função qualquer f (n-1)
 \ensuremath{\begin{lcbr}\begin{lcbr}\Varid{f}\;\mathrm{0}\mathrel{=}\mathrm{1}\\\Varid{f}\;\Varid{n}\mathrel{=}\Varid{f2}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{*}\Varid{f}\;(\Varid{n}\mathbin{-}\mathrm{1})\end{lcbr}\\\begin{lcbr}\Varid{f2}\;\mathrm{0}\mathrel{=}\mathrm{2}\\\Varid{f2}\;\Varid{n}\mathrel{=}\Varid{n}\mathbin{+}\mathrm{2}\end{lcbr}\end{lcbr}}
 \end{eqnarray*}
 
-Feito para o n!. Agora aplicamos a mesma regra a todas as ocorrencia de n e por 
-fim extraimos os seus valores iniciais e operações para o \textit{ciclo for}
+Feito o procedimento para o \(n!\), aplicamos a mesma regra a
+ todas as ocorrências de \(n\) e, por fim, extraímos os seus valores iniciais 
+ e operações para o \textit{ciclo for}.
 
 \begin{eqnarray*}
 \start
@@ -1513,21 +1527,20 @@ fim extraimos os seus valores iniciais e operações para o \textit{ciclo for}
 \ensuremath{\begin{lcbr}\begin{lcbr}\Varid{g1}\;\mathrm{0}\mathrel{=}\mathrm{4}\\\Varid{g1}\;\Varid{n}\mathrel{=}\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{4}\end{lcbr}\\\begin{lcbr}\Varid{g2}\;\mathrm{0}\mathrel{=}\mathrm{5}\\\Varid{g2}\;\Varid{n}\mathrel{=}\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{5}\end{lcbr}\end{lcbr}}
 \ensuremath{\begin{lcbr}\Varid{g}\;\mathrm{0}\mathrel{=}\mathrm{6}\\\Varid{g}\;\Varid{n}\mathrel{=}\Varid{g1}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{*}\Varid{g2}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{*}\Varid{g}\;(\Varid{n}\mathbin{-}\mathrm{1})\end{lcbr}}
 \end{eqnarray*}
+Encontramos finalmente todas as operações e valores iniciais,
+obtendo assim a nossa equação do \textit{picalc} neste modelo.
 
-Agora finalmente temos todas as operações e valores inicias tendo a nossa equação
-do picalc neste modelo
 \begin{eqnarray*}
 \start
 \ensuremath{\begin{lcbr}\pi_{\mathit{calc}}\;\mathrm{0}\mathrel{=}\mathrm{2}\\\Varid{f}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{t}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{/}\Varid{g}\;(\Varid{n}\mathbin{-}\mathrm{1})\mathbin{+}\pi_{\mathit{calc}}\;(\Varid{n}\mathbin{-}\mathrm{1})\end{lcbr}}
 \end{eqnarray*}
 
-Vamos agora construir piloop com as informações que nos calculamos anteriormente
-(para simplificação chamaremos s = picalcRec)
+Procede-se agora à construção de \textit{piloop} com as 
+informações previamente calculadas (para simplificação, designaremos \(s = \textit{picalcRec}\)).
 
-Vamos agorar fazer as operações:
+Seguem-se as operações relativas a \(s\):
 
-
-Operação do s:
+\textbf{Operação de \(s\):}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{17}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1539,7 +1552,7 @@ Operação do s:
 \ColumnHook
 \end{hscode}\resethooks
 
-Operação do g:
+\textbf{Operação de \(g\):}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{17}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1551,7 +1564,7 @@ Operação do g:
 \ColumnHook
 \end{hscode}\resethooks
 
-Operação do t:
+\textbf{Operação de \(t\):}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1561,7 +1574,7 @@ Operação do t:
 \ColumnHook
 \end{hscode}\resethooks
 
-Operação do f:
+\textbf{Operação de \(f\):}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{14}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1573,7 +1586,7 @@ Operação do f:
 \ColumnHook
 \end{hscode}\resethooks
 
-operação do f2
+\textbf{Operação de \(f2\):}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1583,7 +1596,7 @@ operação do f2
 \ColumnHook
 \end{hscode}\resethooks
 
-Operação do g1:
+\textbf{Operação de \(g1\):}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{13}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1595,7 +1608,7 @@ Operação do g1:
 \ColumnHook
 \end{hscode}\resethooks
 
-Operação do g2:
+\textbf{Operação de \(g2\):}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{13}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1606,8 +1619,7 @@ Operação do g2:
 \>[13]{}\Varid{g2}\mathbin{+}\mathrm{2}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-
-Temos agora tudo para construir o \textit{ciclo for} 
+Dispomos agora de todos os elementos necessários para construir o \textit{ciclo for}.
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1656,10 +1668,8 @@ E as operações ja definimos também:
 \>[28]{}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-
-por fim precisamos filtrar somente o nosso resultado que vai ser a primeira componente 
-do tuplo:
-
+Por fim, é necessário filtrar apenas o resultado, que corresponde à 
+primeira componente do tuplo:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1667,7 +1677,8 @@ do tuplo:
 \ColumnHook
 \end{hscode}\resethooks
 
-Por fim temos a nossa função feita baseada num \textit{ciclo for} 
+Finalmente, obtém-se a função construída com base num \textit{ciclo for}.
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1677,7 +1688,7 @@ Por fim temos a nossa função feita baseada num \textit{ciclo for}
 
 \subsection*{Problema 4}
 
-Primeiro resolvendo o functor que se aplica em Vec terá os tipos:
+Começa-se por resolver o functor aplicado a \textit{Vec}, o qual terá os seguintes tipos:
 \begin{eqnarray*}
 \xymatrix@C=2cm{
 &
@@ -1688,7 +1699,7 @@ Primeiro resolvendo o functor que se aplica em Vec terá os tipos:
 }
 \end{eqnarray*}
 
-Portanto facilmente chegamos numa definição deste functor explicita neste diagrama:
+Assim, chegamos facilmente à definição explícita deste functor, apresentada no seguinte diagrama:
 
 \[
 \centerline{
@@ -1707,7 +1718,7 @@ Portanto facilmente chegamos numa definição deste functor explicita neste diag
 }
 \]
 
-e em Haskell como:
+Em \Haskell, a definição é dada por:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1720,10 +1731,11 @@ e em Haskell como:
 \ColumnHook
 \end{hscode}\resethooks
 
-Agora temos que definir o (>>=) e o return deste Monad, para tal efeito precisaremos
-de ter ${\mu}$ para a facilitação de cálculos e completude do problema.
+Deve agora definir-se o operador \((>>=)\) e a função \textit{return} desta \textit{Monad}. 
+Para tal, será necessário dispor de \(\mu\) para facilitar os cálculos e 
+garantir a completude do problema.
 
-Nosso ${\mu}$ terá obviamente os tipos:
+O nosso \(\mu\) terá, naturalmente, os seguintes tipos:
 
 \begin{eqnarray*}
 \xymatrix@C=2cm{
@@ -1734,8 +1746,7 @@ Nosso ${\mu}$ terá obviamente os tipos:
     \ensuremath{\Conid{Vec}\;\Conid{A}}
 }
 \end{eqnarray*}
-
-partiremos então com a resolução do diagrama nomeando nossa função ${\mu}$ como 
+Iniciaremos, então, a resolução do diagrama, nomeando a nossa função \(\mu\) como:
 \textit{miuV}:
 \[
 \centerline{
@@ -1762,8 +1773,8 @@ partiremos então com a resolução do diagrama nomeando nossa função ${\mu}$ 
 }
 \]
 
-também teremos que fazer o \textit{miuaux} que fará a multiplicação de todos os 
-elementos do vetor associado ao número.
+Será igualmente necessário definir o \textit{miuaux}, que 
+realizará a multiplicação de todos os elementos do vetor associado ao número.
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1794,7 +1805,8 @@ elementos do vetor associado ao número.
     }
 \end{eqnarray*}
 
-Temos agora definido as duas funções em haskell.
+Procedeu-se à definição das duas funções em \Haskell.
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1806,8 +1818,8 @@ Temos agora definido as duas funções em haskell.
 \ColumnHook
 \end{hscode}\resethooks
 
-Agora com o \textit{miuV} definido podemos facilmente calcular (x >>= f) de acordo com a
-(88) do formulário de \cp{Cálculo de Programas} 
+Com o \textit{miuV} definido, é possível calcular facilmente \((x >>= f)\) de
+ acordo com a fórmula (88) do formulário de \cp{Cálculo de Programas}.
 
 \begin{eqnarray*}
 \start
@@ -1816,18 +1828,22 @@ Agora com o \textit{miuV} definido podemos facilmente calcular (x >>= f) de acor
 \ensuremath{\Varid{x}\bind \Varid{f}\mathrel{=}(\Varid{miuV}\comp \mathsf{fmap}\;\Varid{f})\;\Varid{x}}
 \end{eqnarray*}
 
-Agora nos falta calcular o return. Sabemos que miuV . return = id então o return será 
+Falta ainda calcular a função \textit{return}.
+ Sabemos que \(\mu_V \circ \textit{return} = \textit{id}\);
+  portanto, a definição de \textit{return} será:
 
 \begin{eqnarray*}
 \start
 \ensuremath{\Varid{return}\mathrel{=}\Conid{V}\comp \Varid{singl}\comp \conj{\Varid{id}}{\underline{\mathrm{1}}}}
 \end{eqnarray*}
 
-Associamos ao numero 1 pois 1 é o elemento neutro da multiplicação então quando aplicamos
-miuv isto multiplica todos os elementos por 1 resultando no mesmo vetor. 
-Exprimos em haskell o \textit{binding} e o \textit{return} como:
+Associa-se o número 1, dado que este é o elemento
+neutro da multiplicação; assim, ao aplicar \(\mu_V\),
+todos os elementos são multiplicados por 1, resultando
+no mesmo vetor. Expressam-se em \Haskell\ o \textit{binding}
+e o \textit{return} da seguinte forma:
 
-Monad:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{4}{@{}>{\hspre}l<{\hspost}@{}}%

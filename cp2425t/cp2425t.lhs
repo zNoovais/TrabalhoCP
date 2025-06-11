@@ -702,19 +702,22 @@ que sejam necessárias.
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
 
 \subsection*{Problema 1}
+O Problema 1 foi resolvido utilizando um \textit{hilomorfismo}, 
+que consiste em um \textit{anamorfismo} que "faz pouco" e um 
+\textit{catamorfismo} que "faz muito" — ou seja, uma abordagem do 
+tipo \textit{Easy Split / Hard Join}.
 
-O problema 1 foi resolvido usando um hilomorfismo que consiste num anamorfismo
-que "faz pouco" e um catarmorfismo que "faz muito" ou seja um Easy Split/Hard Join.
+Começamos com o \textit{anamorfismo}:
 
-começamos com o anamorfismo:
 
 \begin{code}
 mysuffixes :: [a] -> [[a]]
 mysuffixes = anaList ((id -|- split cons p2) . outList)
 \end{code}
 
-Agora podemos começar com a cabeça de cada sub-lista e fazer uma procura exaustiva pela 
-lista de listas
+De seguida, podemos começar pela cabeça de cada 
+sublista e realizar uma busca exaustiva na lista de listas.
+
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -729,15 +732,16 @@ lista de listas
 }
 \end{eqnarray*}
 
-No final ao fazer a procura e o calculo todo em todas as sublistas fazemos o catamorfismo
-mymaximum que retira o maior elemento de uma lista
+No final, após realizar a procura e o cálculo em todas as sublistas, 
+aplicamos o \textit{catamorfismo} \textit{mymaximum}, que extrai o maior
+ elemento de uma lista.
 
 \begin{code}
 mymaximum :: [Int] -> Int
 mymaximum = cataList (either (const 0) (uncurry max))
 \end{code}
-que de todas as sublistas calculadas a área maxima temos uma lista de áreas maximas então 
-calculamos o maximo 
+Como de cada sublista calculada obtemos a área máxima, 
+ficamos com uma lista de áreas máximas. Assim, aplicamos o cálculo do máximo sobre essa lista.
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
 &
@@ -747,8 +751,10 @@ calculamos o maximo
     |Nat0|   
 }
 \end{eqnarray*} 
-Agora precisamos de uma função \textit{area} que a partir de um par head e tail faça o calculo 
-tendo em conta sempre a cabeça
+\textbf{Neste passo}, necessitamos de uma função \textit{area}
+ que, a partir de um par \textit{head} e \textit{tail}, efectue o cálculo tendo 
+ sempre em conta a cabeça.
+
 \begin{code}
 area :: (Int,[Int]) -> Int
 \end{code}
@@ -781,16 +787,17 @@ area :: (Int,[Int]) -> Int
     \ar[uuu]_-{|mymaximum|} 
 }
 \end{eqnarray*}
-
-Onde temos como função auxiliar \textit{auxarea} que faz o calculo e a alternativa 
-qual dos extremos é o menor pra calcular a área.
+Temos como função auxiliar a \textit{auxarea}, que efectua o cálculo e 
+determina qual dos extremos é o menor para calcular a área.
 \begin{code}
 auxarea :: (Int,(Int,Int)) -> Int
 \end{code}
-Quero lembrar que o do par |Nat0 >< (Nat0 >< Nat0)| a \textbf{primeira componente} é a head ou seja uma 
-das alturas que estamos a calcular, a \textbf{segunda componente} é a segunda altura e por fim a 
-\textbf{ultima componente} é a respetiva distância entre as duas alturas. Agora basta verificar qual das 
-alturas é a menor e multiplicar pela distância.
+
+Recordo que, no par |Nat0 >< (Nat0 >< Nat0)|, a \textbf{primeira componente} é a 
+\textit{head}, ou seja, uma das alturas que estamos a calcular; a \textbf{segunda componente} 
+é a segunda altura; e, por fim, a \textbf{última componente} é a respetiva distância entre as 
+duas alturas. Basta agora verificar qual das alturas é a menor e multiplicar pela distância.
+
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
     |Nat0 >< (Nat0 >< Nat0)|
@@ -810,17 +817,14 @@ alturas é a menor e multiplicar pela distância.
 &  
 }
 \end{eqnarray*}
-
-Agora podemos exprimir \textit{area} e \textit{auxarea} em Haskell como:
+Podemos agora exprimir as funções \textit{area} e \textit{auxarea} em \Haskell\ da seguinte forma:
 \begin{code}
 
 auxarea = uncurry (*) . (either p2 p1 >< id) . (grd (uncurry (>)) >< id) . assocl
 
 area = mymaximum . map auxarea . uncurry zip . (uncurry replicate . swap >< id ) . split (id >< length) p2  . (id >< map swap . zip [1..])
 \end{code}
-
-Finalmente temos uma definição para o mostwater que pode ser expressa neste diagrama:
-
+Finalmente, temos uma definição para o \textit{mostwater}, que pode ser representada no seguinte diagrama:
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
 &
@@ -842,10 +846,10 @@ Finalmente temos uma definição para o mostwater que pode ser expressa neste di
     |Nat0|
 }
 \end{eqnarray*}
+Para transformar num hilomorfismo de listas, podemos utilizar algumas leis 
+do \cp{Cálculo de Programas}, nomeadamente a 
+\textit{Composição de maps} e a \textit{Absorção-Cata}.
 
-Claro que para transformar num hylomorfismo de listas podemos utilizar algumas leis
-do \cp{Cálculo de Programas} nomeadamente a \textit{Composição de maps} e a 
-\textit{Absorção-Cata}
 \begin{eqnarray*}
 \start
 |
@@ -869,12 +873,13 @@ do \cp{Cálculo de Programas} nomeadamente a \textit{Composição de maps} e a
 |
 \qed
 \end{eqnarray*}
-Temos a definição de mostwater como um hylomorfismo:
+Temos a definição de \textit{mostwater} como um \textit{hilomorfismo}:
 \begin{code}
 mostwater = hyloList (either (const 0) (uncurry max . ((area . split head tail) >< id)))  ((id -|- split cons p2) . outList)
 \end{code}
-Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando claro o seu 
-\textit{divide} e o seu \textit{conquer} também expondo a sua estrutura intermediária: 
+Podemos agora exprimir o \textit{mostwater} no seu diagrama de \textit{hilomorfismo}, 
+evidenciando o seu \textit{divide} e o seu \textit{conquer}, bem como explicitando a sua 
+estrutura intermédia:
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -909,8 +914,8 @@ Podemos agora exprimir o mostwater no seu diagrama do hylomorfismo deixando clar
 
 \subsection*{Problema 2}
 
-Pra resolver este problema foi criado uma estrutura para facilitar a visualização
-da resolução. 
+Para resolver este problema, foi criada uma estrutura que facilita a visualização da solução.
+
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -921,24 +926,26 @@ da resolução.
     \ar@@/^/[l]^-{|inLP|}
 }
 \end{eqnarray*}
+Tal que o \textit{inLP} é definido como a construção
+ de uma lista, mantendo o valor da segunda componente:
 
-Tal que o inLP é definido como a construção de uma lista mantendo o valor da segunda 
-componente:
 \begin{code}
 inLP = either (nil >< id) ((uncurry (++) >< id) . assocl)
 \end{code}
-E o outLP é definido como uma alternativa entre a primeira componente ser 
-a lista vazia ou não. Assim colocando o unico valor numa lista (para efeitos futuros)
+O \textit{outLP} é definido como uma alternativa entre a primeira componente 
+ser a lista vazia ou não, colocando assim o único valor numa lista.
+
 \begin{code}
 outLP ([],s) = i1 ((),s)
 outLP (h:t,s) = i2 (singl h,(t,s))
 \end{code}
 
-Com o \textit{inLP} e o \textit{outLP} definidos podemos definir o seu funtor recursivo
-e com isso podemos admitir o seu catamorfismo e o seu anamorfismo. 
+Com o \textit{inLP} e o \textit{outLP} definidos, 
+podemos definir o seu functor recursivo, o que nos 
+permite admitir o seu \textit{catamorfismo} e o seu \textit{anamorfismo}.
 
-Primeiro fazemos com o catamorfismo, faremos o catamorfismo identidade ou seja 
-sendo seu gene o inLP:
+Começamos pelo \textit{catamorfismo}, 
+concretamente o \textit{catamorfismo} identidade, sendo o seu gerador o \textit{inLP}:
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -956,9 +963,10 @@ sendo seu gene o inLP:
 }
 \end{eqnarray*}
 
-Podemos ver que está certo pelos tipos e sabemos que vai ser analogo ao anamorfismo,
-e com este diagrama podemos ver claramente o funtor recursivo da estrutura LP
-sendo:
+A correção pode ser confirmada pela análise dos tipos, sabendo-se que esta é análoga ao \textit{anamorfismo}. 
+O presente diagrama possibilita a visualização clara do funtor recursivo da estrutura \textbf{LP}, 
+definido como:
+
 \begin{code}
 recLP f = id -|- (id >< f)
 \end{code}
@@ -970,17 +978,19 @@ cataLP g = g . recLP (cataLP g) . outLP
 anaLP g = inLP . recLP (anaLP g) . g
 \end{code}
 
+Agora, pela ordem natural de \textbf{computação} dos \textit{catamorfismos} e \textit{anamorfismos}, 
+podemos definir as funções \textit{mapAccumRfilter} e \textit{mapAccumLfilter} da seguinte forma:
 
-Agora facilmente pela ordem natural de computação dos catamorfismos e anamorfismos posso 
-definir as funções mapAccumRfilter e mapAccumLfilter como:
 \begin{code}
 mapAccumRfilter h f = cataLP (either (nil >< id) (auxR h f))
 
 mapAccumLfilter h f = anaLP ((id -|- auxL h f) . outLP)
 \end{code}
 
-Agora nos falta fazer um simples \cp{Cálculo de Programas} para determinar auxR e auxL
-mas antes fazemos os diagramas para deixar explícito os tipos de ambas as funções 
+Faltam ainda alguns passos de \textbf{cálculo}
+para determinar as funções \textit{auxR} e \textit{auxL}. 
+Antes disso, apresentam-se os diagramas que explicitam os tipos de ambas as funções.
+
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -1007,13 +1017,13 @@ tipo de auxR:
     |B|^* |>< S|
 }
 \end{eqnarray*}
-ou em Haskell:
+ou em \Haskell:
 \begin{code}
 auxR :: ((a,s) -> Bool) -> ((a,s) -> (c,s)) -> ([a],([c],s)) -> ([c],s)
 \end{code}
 
-Agora desenvolveremos o diagrama a partir do tipo inicial tendo em conta as funções
-h (verificação) e f (transformação)
+Segue-se o desenvolvimento do diagrama a partir do tipo inicial, 
+tendo em conta as funções \textit{h} (verificação) e \textit{f} (transformação).
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -1049,13 +1059,13 @@ h (verificação) e f (transformação)
 &
 }
 \end{eqnarray*}
-Temos a definição de auxR:
+Apresenta-se a definição de \textit{auxR}:
 \begin{code}
 auxR h f =  choice . grd p1 . (h >< (f >< id)) . split (id >< p2) (assocl . (id >< swap)) . (head >< id) where
     choice = either (swap . ( id >< uncurry (:) ) . assocr . (swap >< id) . p2) ( swap . (p2 >< id ) . p2)
 \end{code}
+Segue-se uma definição análoga para \textit{auxL}, partindo de um \textit{anamorfismo}:
 
-Agora faremos parecido para o auxL partindo de um anamorfismo:
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
     |B|^* |>< S|
@@ -1076,7 +1086,8 @@ Agora faremos parecido para o auxL partindo de um anamorfismo:
 }
 \end{eqnarray*}
 
-Sendo então o tipo da função auxL:
+Considera-se, então, o tipo da função \textit{auxL}:
+
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
 &
@@ -1086,13 +1097,15 @@ Sendo então o tipo da função auxL:
     |C|^* | >< (A|^* |>< S)|
 }
 \end{eqnarray*}
+Definido em \Haskell\ como:
 
-Em Haskell definido:
 \begin{code}
 auxL :: ((a,s) -> Bool) -> ((a,s) -> (c,s)) -> ([a],([a],s)) -> ([c],([a],s))
 \end{code}
-Agora desenvolveremos o diagrama a partir do tipo inicial tendo em conta as funções
-h (verificação) e f (transformação) pra chegar numa conclusão do codigo do 
+
+Segue-se o desenvolvimento do diagrama a partir do tipo inicial, tendo em conta as 
+funções \textit{h} (verificação) e \textit{f} (transformação), com o objetivo de 
+alcançar uma conclusão para o código da função \textit{auxL}
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -1135,26 +1148,26 @@ h (verificação) e f (transformação) pra chegar numa conclusão do codigo do
      \ar[ruuuu]^-{|id|}
 }
 \end{eqnarray*}
-
-Com isso finalmente temos a definição do auxL em Haskell:
+Desta forma, obtém-se finalmente a definição de \textit{auxL} em \Haskell:
 \begin{code}
 auxL h f =  choice  . (id >< (( id >< swap ) . assocr)) . assocr . (split h f >< id) . assocl . (head >< swap) where
     choice = either ((singl >< id) . p2 ) (( nil >< id) . p2) . grd p1
 \end{code}
 
 \subsection*{Problema 3}
+O Problema 3 foi resolvido por recursividade mútua, tendo como objetivo 
+definir as funções que realizam chamadas recursivas mútuas entre si. Para tal, 
+é necessária a forma recursiva do somatório em \Haskell.
 
-O problema 3 foi resolvido por recursividade mutua, primeiro como objetivo:
-definir as funçoes que mutuamente realizam chamadas recursivas entre si. 
-    Para isto precisamos da forma recursiva do somatorio em haskell
 \begin{code}
 picalcRec :: Fractional a => Integer -> a
 picalcRec 0 = 2
 picalcRec n = fromIntegral (Nat.fac n)^2 * 2^(n+1) / fromIntegral (Nat.fac (2*n+1)) + picalc (n-1)
 \end{code}
-Podemos ver que nesta definição há várias dependencia de n, temos que aplicar a 
-\textit{regra da algibeira} para cada ocorrencia, ou seja, para cada ocorrencia
-de n temos que associar a outra função qualquer f (n-1)
+
+Como nesta definição existem várias dependências de \(n\), surge a 
+necessidade de aplicar a \textit{regra da algibeira}. Assim, para cada 
+ocorrência de \(n\), devemos associar uma função qualquer \(f(n-1)\).
 
 \begin{eqnarray*}
 \start
@@ -1195,8 +1208,9 @@ de n temos que associar a outra função qualquer f (n-1)
 |
 \end{eqnarray*}
 
-Feito para o n!. Agora aplicamos a mesma regra a todas as ocorrencia de n e por 
-fim extraimos os seus valores iniciais e operações para o \textit{ciclo for}
+Feito o procedimento para o \(n!\), aplicamos a mesma regra a
+ todas as ocorrências de \(n\) e, por fim, extraímos os seus valores iniciais 
+ e operações para o \textit{ciclo for}.
 
 \begin{eqnarray*}
 \start
@@ -1266,9 +1280,9 @@ fim extraimos os seus valores iniciais e operações para o \textit{ciclo for}
     )
 |
 \end{eqnarray*}
+Encontramos finalmente todas as operações e valores iniciais,
+obtendo assim a nossa equação do \textit{picalc} neste modelo.
 
-Agora finalmente temos todas as operações e valores inicias tendo a nossa equação
-do picalc neste modelo
 \begin{eqnarray*}
 \start
 |
@@ -1280,55 +1294,53 @@ do picalc neste modelo
 |
 \end{eqnarray*}
 
-Vamos agora construir piloop com as informações que nos calculamos anteriormente
-(para simplificação chamaremos s = picalcRec)
+Procede-se agora à construção de \textit{piloop} com as 
+informações previamente calculadas (para simplificação, designaremos \(s = \textit{picalcRec}\)).
 
-Vamos agorar fazer as operações:
+Seguem-se as operações relativas a \(s\):
 
-
-Operação do s:
+\textbf{Operação de \(s\):}
 \begin{code}
 inicS = 2
 op_S s f g t =  fromIntegral (f^2*t)/ fromIntegral g + s
 \end{code}
 
-Operação do g:
+\textbf{Operação de \(g\):}
 \begin{code}
 inicG = 6
 op_G g g1 g2 =  g*g1*g2
 \end{code}
 
-Operação do t:
+\textbf{Operação de \(t\):}
 \begin{code}
 inicT = 4
 op_T t = 2*t
 \end{code}
 
-Operação do f:
+\textbf{Operação de \(f\):}
 \begin{code}
 inicF = 1
 op_F f f2 =  f*f2
 \end{code}
 
-operação do f2
+\textbf{Operação de \(f2\):}
 \begin{code}
 inicF2 = 2
 op_F2 f f2 = succ f2
 \end{code}
 
-Operação do g1:
+\textbf{Operação de \(g1\):}
 \begin{code}
 inicG1 = 4
 op_G1 g1 =  g1+2
 \end{code}
 
-Operação do g2:
+\textbf{Operação de \(g2\):}
 \begin{code}
 inicG2 = 5
 op_G2 g2 =  g2+2
 \end{code}
-
-Temos agora tudo para construir o \textit{ciclo for} 
+Dispomos agora de todos os elementos necessários para construir o \textit{ciclo for}.
 
 \begin{code}
 worker = for loop inic
@@ -1350,22 +1362,21 @@ loop (s,g,t,f,f2,g1,g2) =
                            op_G2 g2
                            )
 \end{code}
-
-por fim precisamos filtrar somente o nosso resultado que vai ser a primeira componente 
-do tuplo:
-
+Por fim, é necessário filtrar apenas o resultado, que corresponde à 
+primeira componente do tuplo:
 \begin{code}
 wrapper (x,_,_,_,_,_,_) = x
 \end{code}
 
-Por fim temos a nossa função feita baseada num \textit{ciclo for} 
+Finalmente, obtém-se a função construída com base num \textit{ciclo for}.
+
 \begin{code}
 piloop = wrapper . worker
 \end{code}
 
 \subsection*{Problema 4}
 
-Primeiro resolvendo o functor que se aplica em Vec terá os tipos:
+Começa-se por resolver o functor aplicado a \textit{Vec}, o qual terá os seguintes tipos:
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
 &
@@ -1376,7 +1387,7 @@ Primeiro resolvendo o functor que se aplica em Vec terá os tipos:
 }
 \end{eqnarray*}
 
-Portanto facilmente chegamos numa definição deste functor explicita neste diagrama:
+Assim, chegamos facilmente à definição explícita deste functor, apresentada no seguinte diagrama:
 
 \[
 \centerline{
@@ -1395,17 +1406,18 @@ Portanto facilmente chegamos numa definição deste functor explicita neste diag
 }
 \]
 
-e em Haskell como:
+Em \Haskell, a definição é dada por:
 
 \begin{code}
 instance Functor Vec where
     fmap f = V . map (f >< id) . outV
 \end{code}
 
-Agora temos que definir o (>>=) e o return deste Monad, para tal efeito precisaremos
-de ter ${\mu}$ para a facilitação de cálculos e completude do problema.
+Deve agora definir-se o operador \((>>=)\) e a função \textit{return} desta \textit{Monad}. 
+Para tal, será necessário dispor de \(\mu\) para facilitar os cálculos e 
+garantir a completude do problema.
 
-Nosso ${\mu}$ terá obviamente os tipos:
+O nosso \(\mu\) terá, naturalmente, os seguintes tipos:
 
 \begin{eqnarray*}
 \xymatrix@@C=2cm{
@@ -1416,8 +1428,7 @@ Nosso ${\mu}$ terá obviamente os tipos:
     |Vec A|
 }
 \end{eqnarray*}
-
-partiremos então com a resolução do diagrama nomeando nossa função ${\mu}$ como 
+Iniciaremos, então, a resolução do diagrama, nomeando a nossa função \(\mu\) como:
 \textit{miuV}:
 \[
 \centerline{
@@ -1444,8 +1455,8 @@ partiremos então com a resolução do diagrama nomeando nossa função ${\mu}$ 
 }
 \]
 
-também teremos que fazer o \textit{miuaux} que fará a multiplicação de todos os 
-elementos do vetor associado ao número.
+Será igualmente necessário definir o \textit{miuaux}, que 
+realizará a multiplicação de todos os elementos do vetor associado ao número.
 
 \begin{code}
 miuaux :: ([(a,Int)],Int) -> [(a,Int)]
@@ -1473,7 +1484,8 @@ miuaux :: ([(a,Int)],Int) -> [(a,Int)]
     }
 \end{eqnarray*}
 
-Temos agora definido as duas funções em haskell.
+Procedeu-se à definição das duas funções em \Haskell.
+
 \begin{code}
 miuaux = map ((id >< uncurry (*)) . assocr). uncurry zip . (id >< uncurry replicate) . assocr . (split id length >< id)
 
@@ -1481,8 +1493,8 @@ miuV :: Vec (Vec a) -> Vec a
 miuV = V . concatMap (miuaux . (outV >< id)) . outV
 \end{code}
 
-Agora com o \textit{miuV} definido podemos facilmente calcular (x >>= f) de acordo com a
-(88) do formulário de \cp{Cálculo de Programas} 
+Com o \textit{miuV} definido, é possível calcular facilmente \((x >>= f)\) de
+ acordo com a fórmula (88) do formulário de \cp{Cálculo de Programas}.
 
 \begin{eqnarray*}
 \start
@@ -1493,18 +1505,22 @@ Agora com o \textit{miuV} definido podemos facilmente calcular (x >>= f) de acor
 |
 \end{eqnarray*}
 
-Agora nos falta calcular o return. Sabemos que miuV . return = id então o return será 
+Falta ainda calcular a função \textit{return}.
+ Sabemos que \(\mu_V \circ \textit{return} = \textit{id}\);
+  portanto, a definição de \textit{return} será:
 
 \begin{eqnarray*}
 \start
 | return = V . singl . split id (const 1)|
 \end{eqnarray*}
 
-Associamos ao numero 1 pois 1 é o elemento neutro da multiplicação então quando aplicamos
-miuv isto multiplica todos os elementos por 1 resultando no mesmo vetor. 
-Exprimos em haskell o \textit{binding} e o \textit{return} como:
+Associa-se o número 1, dado que este é o elemento
+neutro da multiplicação; assim, ao aplicar \(\mu_V\),
+todos os elementos são multiplicados por 1, resultando
+no mesmo vetor. Expressam-se em \Haskell\ o \textit{binding}
+e o \textit{return} da seguinte forma:
 
-Monad:
+
 \begin{code}
 instance Monad Vec where
    x >>= f = miuV (fmap f x)
